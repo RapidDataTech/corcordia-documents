@@ -1,0 +1,5323 @@
+USE [master]
+GO
+/****** Object:  Database [concordiaods]    Script Date: 28-09-2021 19:21:42 ******/
+CREATE DATABASE [concordiaods]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'concordiaods', FILENAME = N'E:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\concordiaods.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'concordiaods_log', FILENAME = N'E:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\concordiaods_log.ldf' , SIZE = 139264KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+GO
+ALTER DATABASE [concordiaods] SET COMPATIBILITY_LEVEL = 130
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [concordiaods].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [concordiaods] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [concordiaods] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [concordiaods] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [concordiaods] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [concordiaods] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [concordiaods] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [concordiaods] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [concordiaods] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [concordiaods] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [concordiaods] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [concordiaods] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [concordiaods] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [concordiaods] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [concordiaods] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [concordiaods] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [concordiaods] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [concordiaods] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [concordiaods] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [concordiaods] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [concordiaods] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [concordiaods] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [concordiaods] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [concordiaods] SET RECOVERY FULL 
+GO
+ALTER DATABASE [concordiaods] SET  MULTI_USER 
+GO
+ALTER DATABASE [concordiaods] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [concordiaods] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [concordiaods] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [concordiaods] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [concordiaods] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [concordiaods] SET QUERY_STORE = OFF
+GO
+USE [concordiaods]
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET LEGACY_CARDINALITY_ESTIMATION = OFF;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET MAXDOP = 0;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET PARAMETER_SNIFFING = ON;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET QUERY_OPTIMIZER_HOTFIXES = OFF;
+GO
+USE [concordiaods]
+GO
+/****** Object:  User [NT AUTHORITY\SYSTEM]    Script Date: 28-09-2021 19:21:45 ******/
+CREATE USER [NT AUTHORITY\SYSTEM] FOR LOGIN [NT AUTHORITY\SYSTEM] WITH DEFAULT_SCHEMA=[dbo]
+GO
+ALTER ROLE [db_owner] ADD MEMBER [NT AUTHORITY\SYSTEM]
+GO
+/****** Object:  Table [dbo].[customer]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[customer](
+	[customer_id] [int] IDENTITY(1,1) NOT NULL,
+	[userType] [varchar](45) NULL,
+	[firstName] [varchar](45) NULL,
+	[lastName] [varchar](45) NULL,
+	[trnNumber] [bigint] NULL,
+	[typeOfOccupancy] [varchar](45) NULL,
+	[mobileNumber] [varchar](50) NULL,
+	[emailId] [varchar](225) NULL,
+	[password] [varchar](max) NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[lastLogin] [datetime] NULL,
+	[title] [varchar](45) NULL,
+	[CompanyName] [varchar](225) NULL,
+	[CompanyStatus] [varchar](225) NULL,
+	[companyMobileNumber] [varchar](50) NULL,
+	[companyEmailId] [varchar](225) NULL,
+	[mobileCode] [varchar](50) NULL,
+	[LocationName] [varchar](50) NULL,
+ CONSTRAINT [PK_customer] PRIMARY KEY CLUSTERED 
+(
+	[customer_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[address]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[address](
+	[address_id] [int] IDENTITY(1,1) NOT NULL,
+	[customer_id] [int] NOT NULL,
+	[address] [varchar](255) NULL,
+	[country] [varchar](50) NULL,
+	[city] [varchar](50) NULL,
+	[created_ts] [datetime] NULL,
+	[poBox] [varchar](45) NULL,
+	[modified_ts] [datetime] NULL,
+	[type] [varchar](50) NULL,
+ CONSTRAINT [PK_address] PRIMARY KEY CLUSTERED 
+(
+	[address_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  View [dbo].[viewCustomerReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE   view [dbo].[viewCustomerReports] as SELECT a.customer_id AS Id, a.firstName, a.lastName, a.trnNumber, a.typeOfOccupancy, a.userType, a.mobileNumber, a.emailId, a.title, a.CompanyName, a.CompanyStatus, a.companyMobileNumber, a.companyEmailId, a.created_ts, b.address, 
+                  b.city, b.country
+FROM     dbo.customer AS a LEFT OUTER JOIN
+                  dbo.address AS b ON b.customer_id = a.customer_id
+WHERE  (a.userType = 'registered user')
+GO
+/****** Object:  Table [dbo].[invoiceDetailMapping]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[invoiceDetailMapping](
+	[invoiceDetailMapping_id] [int] IDENTITY(1,1) NOT NULL,
+	[invoice_id] [int] NULL,
+	[job_id] [int] NOT NULL,
+	[quotation_id] [int] NULL,
+ CONSTRAINT [PK_invoiceDetailMapping] PRIMARY KEY CLUSTERED 
+(
+	[invoiceDetailMapping_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[location]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[location](
+	[location_id] [int] IDENTITY(1,1) NOT NULL,
+	[locationName] [varchar](255) NULL,
+	[created_ts] [datetime] NULL,
+	[locationCode] [varchar](50) NULL,
+	[UserDefinedLookupId] [int] NULL,
+ CONSTRAINT [PK_location] PRIMARY KEY CLUSTERED 
+(
+	[location_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[payment]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[payment](
+	[payment_id] [int] IDENTITY(1,1) NOT NULL,
+	[paymentMode] [varchar](45) NULL,
+	[cardInfo] [varchar](45) NULL,
+	[recievedDate] [datetime] NULL,
+	[orderReferenceNumber] [varchar](50) NULL,
+	[status] [varchar](45) NULL,
+	[paymentAmount] [float] NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_payment] PRIMARY KEY CLUSTERED 
+(
+	[payment_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[serviceItemDetail]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[serviceItemDetail](
+	[servicedetailitem_id] [int] IDENTITY(1,1) NOT NULL,
+	[serviceBooking_id] [int] NULL,
+	[booking_id] [int] NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_serviceitemDetail_1] PRIMARY KEY CLUSTERED 
+(
+	[servicedetailitem_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[jobBooking]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[jobBooking](
+	[booking_id] [int] IDENTITY(1,1) NOT NULL,
+	[customer_id] [int] NULL,
+	[location_id] [int] NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[floorNumber] [varchar](45) NULL,
+	[apartmentUnitNumber] [varchar](50) NULL,
+	[billingAddress] [varchar](255) NULL,
+	[additionalNote] [varchar](255) NULL,
+	[status] [varchar](45) NULL,
+	[jobidQuotationMapping_id] [int] NULL,
+	[propertyType] [varchar](45) NULL,
+	[errorMessage] [varchar](max) NULL,
+	[errorCode] [varchar](255) NULL,
+	[buildingName] [varchar](45) NULL,
+	[orderReference] [varchar](255) NULL,
+	[access_token] [varchar](max) NULL,
+	[customerstatus] [varchar](50) NULL,
+ CONSTRAINT [PK_jobBooking] PRIMARY KEY CLUSTERED 
+(
+	[booking_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[invoice]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[invoice](
+	[invoice_id] [int] IDENTITY(1000,1) NOT NULL,
+	[invoiceNumber] [varchar](45) NULL,
+	[invoiceDate] [date] NULL,
+	[supplyDate] [date] NULL,
+	[paymentTerms] [varchar](45) NULL,
+	[payment_id] [int] NULL,
+	[yearlyIterator] [int] NULL,
+	[invoiceType] [varchar](50) NULL,
+	[posTransaction] [varchar](max) NULL,
+ CONSTRAINT [PK_invoice] PRIMARY KEY CLUSTERED 
+(
+	[invoice_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[serviceItems]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[serviceItems](
+	[serviceBooking_id] [int] IDENTITY(1,1) NOT NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[serviceName] [varchar](45) NULL,
+	[quantity] [varchar](50) NULL,
+	[unitPrice] [float] NULL,
+	[discountAmount] [float] NULL,
+	[vatPercentage] [float] NULL,
+	[netAmount] [float] NULL,
+	[vatAmount] [float] NULL,
+	[totalAmount] [float] NULL,
+	[status] [varchar](45) NULL,
+	[problems] [varchar](100) NULL,
+	[prefferedTime] [varchar](50) NULL,
+	[prefferedDate] [varchar](50) NULL,
+	[propertyTypeName] [varchar](50) NULL,
+	[description] [varchar](4000) NULL,
+	[loc] [varchar](50) NULL,
+	[job_id] [int] NULL,
+	[taskCode] [nchar](25) NULL,
+	[CompletionDate] [datetime] NULL,
+	[category_id] [varchar](50) NULL,
+	[timeslot] [varchar](45) NULL,
+	[errorCode] [varchar](50) NULL,
+	[errorMessage] [varchar](1024) NULL,
+	[propertySize_id] [int] NULL,
+	[cartBooking_id] [int] NULL,
+ CONSTRAINT [PK_serviceItems] PRIMARY KEY CLUSTERED 
+(
+	[serviceBooking_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  View [dbo].[viewJobReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ create   view [dbo].[viewJobReports] as SELECT ROW_NUMBER() OVER (ORDER BY (d .job_id), (a.firstName), (a.lastName), (a.CompanyName), (d .propertyTypeName), (d .category_id), (a.emailId), (a.companyEmailId), (a.mobileNumber), (a.companyMobileNumber), (e.locationName), 
+                  (b.buildingName), (b.apartmentUnitNumber), (b.floorNumber), (d .problems), (b.created_ts), (d .loc), (d .status), (d .prefferedDate), (d .CompletionDate), (d .timeslot), (d .totalAmount), (h.status)) Id, (d .job_id) Jobid, (a.firstName) Firstname, 
+(a.lastName) Lastname, (a.CompanyName) Companyname, (d .propertyTypeName) TypeofUnit, (d .category_id) Category, (a.emailId) Email, (a.companyEmailId) CompanyEmail, (a.mobileNumber) Mobilenumber, (a.companyMobileNumber) 
+Companymobile, (e.locationName) location, (b.buildingName) BuildingName, (b.apartmentUnitNumber) Apartment, (b.floorNumber) FloorNumber, (d .problems) Faultdescription, (b.created_ts) DateCreated, (d .loc) LevelofCompletion, (d .status) 
+Status, (d .prefferedDate) DueBy, (d .CompletionDate) DateCompleted, (d .timeslot) Scheduletime, (d .totalAmount) JobCharge, (h.status) Paymentstatus
+FROM     customer a INNER JOIN
+                  jobBooking b ON b.customer_id = a.customer_id INNER JOIN
+                  location e ON b.location_id = e.location_id INNER JOIN
+                  serviceitemDetail c ON c.booking_id = b.booking_id INNER JOIN
+                  serviceItems d ON c.serviceBooking_id = d .serviceBooking_id LEFT JOIN
+                  invoiceDetailMapping f ON f.job_id = b.booking_id LEFT JOIN
+                  invoice g ON f.invoice_id = g.invoice_id LEFT JOIN
+                  payment h ON g.payment_id = h.payment_id;
+GO
+/****** Object:  View [dbo].[viewJobScheduleReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create   view [dbo].[viewJobScheduleReports] as SELECT ROW_NUMBER() OVER (ORDER BY (d .job_id), (a.firstName), (a.lastName), (a.CompanyName), (d .propertyTypeName), (d .category_id), (a.emailId), (a.companyEmailId), (a.mobileNumber), (a.companyMobileNumber), (e.locationName), 
+                  (b.buildingName), (b.apartmentUnitNumber), (b.floorNumber), (d .problems), (b.created_ts), (d .prefferedDate), (d .timeslot), (h.status), (d .loc)) Id, (d .job_id) Jobid, (a.firstName) Firstname, (a.lastName) Lastname, (a.CompanyName) 
+Companyname, (d .propertyTypeName) TypeofUnit, (d .category_id) Category, (a.emailId) Email, (a.companyEmailId) CompanyEmail, (a.mobileNumber) Mobilenumber, (a.companyMobileNumber) Companymobile, (e.locationName) location, 
+(b.buildingName) BuildingName, (b.apartmentUnitNumber) Apartment, (b.floorNumber) FloorNumber, (d .problems) Faultdescription, (b.created_ts) DateCreated, (d .prefferedDate) Scheduleddate, (d .timeslot) Scheduletime, (h.status) 
+Paymentstatus, (d .loc) LevelofCompletion
+FROM     customer a INNER JOIN
+                  jobBooking b ON b.customer_id = a.customer_id INNER JOIN
+                  location e ON b.location_id = e.location_id INNER JOIN
+                  serviceitemDetail c ON c.booking_id = b.booking_id INNER JOIN
+                  serviceItems d ON c.serviceBooking_id = d .serviceBooking_id LEFT JOIN
+                  invoiceDetailMapping f ON b.booking_id = f.job_id LEFT JOIN
+                  invoice g ON f.invoice_id = g.invoice_id LEFT JOIN
+                  payment h ON g.payment_id = h.payment_id
+WHERE  d .loc = 'Appointment Scheduled';
+GO
+/****** Object:  Table [dbo].[quotation]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[quotation](
+	[quotation_id] [int] IDENTITY(1,1) NOT NULL,
+	[quotationId] [varchar](50) NULL,
+	[subjectLine] [varchar](255) NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[paymentTerms] [varchar](45) NULL,
+	[executionTime] [varchar](45) NULL,
+	[mobilizationTime] [varchar](45) NULL,
+	[quoteValidity] [varchar](45) NULL,
+	[warrantyPeriod] [varchar](45) NULL,
+	[status] [varchar](45) NULL,
+	[totalLumpsum] [varchar](512) NULL,
+	[totalAmount] [float] NULL,
+	[statusDescription] [varchar](512) NULL,
+	[contract] [varchar](45) NULL,
+	[task] [varchar](45) NULL,
+	[building] [varchar](45) NULL,
+	[currencyCode] [varchar](10) NULL,
+	[requestedDate] [varchar](50) NULL,
+	[targetSubmissionDate] [varchar](50) NULL,
+	[submittedDate] [varchar](50) NULL,
+	[orderReference] [varchar](255) NULL,
+	[access_token] [varchar](max) NULL,
+	[errorCode] [varchar](255) NULL,
+	[errorMessage] [varchar](max) NULL,
+	[updateStatus] [bit] NULL,
+ CONSTRAINT [PK_quotation] PRIMARY KEY CLUSTERED 
+(
+	[quotation_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[jobidQuotationMapping]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[jobidQuotationMapping](
+	[jobidQuotationMapping_id] [int] IDENTITY(1,1) NOT NULL,
+	[job_id] [int] NOT NULL,
+	[quotation_id] [int] NOT NULL,
+ CONSTRAINT [PK_jobidQuotationMapping] PRIMARY KEY CLUSTERED 
+(
+	[jobidQuotationMapping_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  View [dbo].[viewQuotationReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create   view [dbo].[viewQuotationReports] as SELECT ROW_NUMBER() OVER (ORDER BY (e.job_id), (i.firstName), (i.lastName), (i.CompanyName), (i.typeOfOccupancy), (f.category_id), (i.emailId), (i.mobileNumber), (i.companyEmailId), (i.companyMobileNumber), (j.locationName), (h.buildingName), 
+                  (h.apartmentUnitNumber), (h.floorNumber), (f.problems), (a.created_ts), (f.loc), (f.status), (a.submittedDate), (a.totalAmount), (c.invoiceNumber), (d .status)) Id, (e.job_id) JobId, (i.firstName) FirstName, (i.lastName) LastName, (i.CompanyName) 
+CompanyName, (i.typeOfOccupancy) TypeOfUnit, (f.category_id) Category, (i.emailId) Email, (i.mobileNumber) Mobilenumber, (i.companyEmailId) CompanyEmail, (i.companyMobileNumber) Companymobile, (j.locationName) Location, (h.buildingName) 
+BuildingName, (h.apartmentUnitNumber) Apartment, (h.floorNumber) FloorNumber, (f.problems) FaultDescription, (a.created_ts) DateCreated, (f.loc) LevelOfCompletion, (f.status) ApprovalStatus, (a.submittedDate) DateCompleted, (a.totalAmount) 
+Charge, (c.invoiceNumber) InvoiceNumber, (d .status) PaymentStatus
+FROM     quotation a LEFT JOIN
+                  invoiceDetailMapping b ON a.quotation_id = b.quotation_id LEFT JOIN
+                  invoice c ON b.invoice_id = c.invoice_id LEFT JOIN
+                  payment d ON c.payment_id = d .payment_id LEFT JOIN
+                  jobidQuotationMapping e ON a.quotation_id = e.quotation_id INNER JOIN
+                  serviceItems f ON e.job_id = f.job_id INNER JOIN
+                  serviceItemDetail g ON f.serviceBooking_id = g.serviceBooking_id INNER JOIN
+                  jobBooking h ON g.booking_id = h.booking_id INNER JOIN
+                  customer i ON h.customer_id = i.customer_id INNER JOIN
+                  location j ON h.location_id = j.location_id
+WHERE  f.loc = 'Quotation Awaiting Approval' OR
+                  f.loc = 'Quotation Approved' OR
+                  f.loc = 'Quotation Rejected/Cancelled';
+GO
+/****** Object:  View [dbo].[JobScheduleReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+   create   view [dbo].[JobScheduleReports] as select (d.job_id)Jobid,(a.firstName)Firstname,(a.lastName)Lastname,
+ (a.CompanyName)Companyname,(d.propertyTypeName)TypeofUnit,(d.category_id)Category,(a.emailId)Email,(a.companyEmailId)CompanyEmail,
+ (a.mobileNumber)Mobilenumber,(a.companyMobileNumber)Companymobile,(e.locationName)location,(b.buildingName)BuildingName,(b.apartmentUnitNumber)
+ Apartment,(b.floorNumber)FloorNumber,(d.problems)Faultdescription ,(b.created_ts)JobdateCreated,(d.prefferedDate)Scheduleddate,(d.timeslot)
+ Scheduletime ,(h.status)Paymentstatus ,(d.loc)LevelofCompletion from customer a inner join jobBooking b on b.customer_id = a.customer_id 
+ inner join location e on b.location_id = e.location_id inner join serviceitemDetail c on c.booking_id = b.booking_id inner join serviceItems d 
+ on c.serviceBooking_id = d.serviceBooking_id left join invoiceDetailMapping f on b.booking_id = f.job_id left join invoice g on 
+ f.invoice_id = g.invoice_id left join payment h on g.payment_id =h.payment_id;
+GO
+/****** Object:  View [dbo].[JobReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create   view [dbo].[JobReports] as  select (d.job_id)Jobid,(a.firstName)Firstname,(a.lastName)Lastname,(a.CompanyName)Companyname,
+ (d.propertyTypeName)TypeofUnit,(d.category_id)Category,(a.emailId)Email,(a.companyEmailId)CompanyEmail,(a.mobileNumber)Mobilenumber,
+ (a.companyMobileNumber)Companymobile,(e.locationName)location,(d.problems)Faultdescription,(b.created_ts)JobdateCreated,(d.loc)LevelofCompletion,
+ (d.status)Status,(d.prefferedDate)DueBy,(d.timeslot)Scheduletime,(d.totalAmount)JobCharge,(h.status)Paymentstatus from customer a inner join 
+ jobBooking b on b.customer_id = a.customer_id inner join location e on b.location_id = e.location_id inner join serviceitemDetail c on 
+ c.booking_id = b.booking_id inner join serviceItems d on c.serviceBooking_id = d.serviceBooking_id left join invoiceDetailMapping f on  
+ f.job_id = b.booking_id left join invoice g on f.invoice_id = g.invoice_id left join payment h on g.payment_id =h.payment_id ;
+GO
+/****** Object:  View [dbo].[CustomerReport]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ create   view [dbo].[CustomerReport] as select a.firstName,a.lastName,a.trnNumber,a.typeOfOccupancy,a.userType,a.mobileNumber,a.emailId,a.title,a.CompanyName,a.CompanyStatus,a.companyMobileNumber,a.companyEmailId,a.created_ts,b.address,b.city,b.country from customer a left JOIN address b on b.customer_id = a.customer_id where a.userType ='registered user';
+GO
+/****** Object:  View [dbo].[QuotationReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+	create   view [dbo].[QuotationReports] as select (e.job_id)JobId,(i.firstName)FirstName,(i.lastName)LastName,(i.CompanyName)CompanyName,(i.typeOfOccupancy)TypeOfUnit,(f.category_id)Category,(i.emailId)EmailId,(i.mobileNumber)MobileNumber,(i.companyEmailId)CompanyEmailId,(i.companyMobileNumber)CompanyMobileNumber,(j.locationName)Location,(f.problems)FaultDescription,(a.created_ts)DateCreated ,(a.status)LevelOfCompletion,(f.status)ApprovalStatus,(a.submittedDate)DateCompleted,(a.totalAmount)Charge,(c.invoiceNumber)InvoiceNumber,(d.status)PaymentStatus  from   quotation a left join invoiceDetailMapping b on a.quotation_id = b.quotation_id left join invoice  c on b.invoice_id = c.invoice_id left join payment d on c.payment_id =d.payment_id left join jobidQuotationMapping e on a.quotation_id = e.quotation_id inner join serviceItems f on e.job_id = f.job_id inner join serviceItemDetail g on f.serviceBooking_id = g.serviceBooking_id inner join jobBooking h on g.booking_id = h.booking_id inner join customer i on h.customer_id = i.customer_id inner join location j on h.location_id = j.location_id ;
+GO
+/****** Object:  View [dbo].[JobScheduleReport]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create   view [dbo].[JobScheduleReport] as select (d.job_id)Jobid,(a.firstName)Firstname,(a.lastName)Lastname,
+ (a.CompanyName)Companyname,(d.propertyTypeName)TypeofUnit,(d.category_id)Category,(a.emailId)Email,(a.companyEmailId)CompanyEmail,
+ (a.mobileNumber)Mobilenumber,(a.companyMobileNumber)Companymobile,(e.locationName)location,(b.buildingName)BuildingName,(b.apartmentUnitNumber)
+ Apartment,(b.floorNumber)FloorNumber,(d.problems)Faultdescription ,(b.created_ts)JobdateCreated,(d.prefferedDate)Scheduleddate,(d.timeslot)
+ Scheduletime ,(h.status)Paymentstatus ,(d.loc)LevelofCompletion from customer a inner join jobBooking b on b.customer_id = a.customer_id 
+ inner join location e on b.location_id = e.location_id inner join serviceitemDetail c on c.booking_id = b.booking_id inner join serviceItems d 
+ on c.serviceBooking_id = d.serviceBooking_id left join invoiceDetailMapping f on b.booking_id = f.job_id left join invoice g on 
+ f.invoice_id = g.invoice_id left join payment h on g.payment_id =h.payment_id;
+GO
+/****** Object:  Table [dbo].[additionalPrices]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[additionalPrices](
+	[additional_id] [int] IDENTITY(1,1) NOT NULL,
+	[additional_price] [float] NULL,
+	[service_id] [int] NULL,
+	[property_id] [int] NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_additionalPrices] PRIMARY KEY CLUSTERED 
+(
+	[additional_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AdminresetPassword]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AdminresetPassword](
+	[reset_id] [int] IDENTITY(1,1) NOT NULL,
+	[resetToken] [varchar](255) NULL,
+	[expireDateTime] [datetime] NULL,
+	[created_ts] [datetime] NULL,
+	[status] [tinyint] NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_AdminresetPassword] PRIMARY KEY CLUSTERED 
+(
+	[reset_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[adminResponse]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[adminResponse](
+	[response_id] [int] IDENTITY(1,1) NOT NULL,
+	[responseCode] [varchar](50) NULL,
+	[responseDescription] [varchar](max) NULL,
+	[responseMessage] [varchar](512) NULL,
+	[responseStatusCode] [int] NULL,
+ CONSTRAINT [PK_adminResponse] PRIMARY KEY CLUSTERED 
+(
+	[response_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[AdminSession]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AdminSession](
+	[session_id] [int] IDENTITY(1,1) NOT NULL,
+	[user_id] [int] NOT NULL,
+	[customerIdentity] [varchar](255) NULL,
+	[data] [varchar](max) NULL,
+	[expireDateTime] [datetime] NULL,
+	[status] [varchar](50) NULL,
+ CONSTRAINT [PK_AdminSession] PRIMARY KEY CLUSTERED 
+(
+	[session_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[backendEndUser]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[backendEndUser](
+	[user_id] [int] IDENTITY(1,1) NOT NULL,
+	[role_id] [int] NOT NULL,
+	[department_id] [int] NOT NULL,
+	[firstName] [varchar](45) NULL,
+	[lastName] [varchar](45) NULL,
+	[emailId] [varchar](45) NULL,
+	[phoneNumber] [varchar](45) NULL,
+	[password] [varchar](45) NULL,
+	[create_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[status] [varchar](45) NULL,
+	[lastLogin] [datetime] NULL,
+	[active] [tinyint] NULL,
+ CONSTRAINT [PK_backendEndUser] PRIMARY KEY CLUSTERED 
+(
+	[user_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Carousal]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Carousal](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[bannerText] [varchar](255) NULL,
+	[buttonText] [varchar](50) NULL,
+	[promotion] [varchar](255) NULL,
+	[pictureId] [int] NOT NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[active] [bit] NULL,
+ CONSTRAINT [PK_Carousal] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CarousalWorkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CarousalWorkflow](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[requestId] [int] NULL,
+	[bannerText] [varchar](255) NULL,
+	[buttonText] [varchar](50) NULL,
+	[promotion] [varchar](255) NULL,
+	[status] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[publisher] [varchar](50) NULL,
+	[statusActionDate] [datetime] NULL,
+	[comments] [varchar](255) NULL,
+	[pictureId] [int] NOT NULL,
+	[modifiedDate] [datetime] NULL,
+	[active] [bit] NULL,
+	[record] [nchar](15) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_CarousalWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[cart]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[cart](
+	[cart_id] [int] IDENTITY(1,1) NOT NULL,
+	[customer_id] [int] NOT NULL,
+	[cartBooking_id] [int] NOT NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_cart] PRIMARY KEY CLUSTERED 
+(
+	[cart_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[cartItems]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[cartItems](
+	[cartBooking_id] [int] IDENTITY(1,1) NOT NULL,
+	[serviceName] [varchar](50) NULL,
+	[quantity] [varchar](50) NOT NULL,
+	[measurementTypeId] [varchar](50) NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[prefferedDate] [varchar](50) NULL,
+	[prefferedTime] [varchar](50) NULL,
+	[description] [varchar](4000) NULL,
+	[problems] [varchar](255) NULL,
+	[propertyTypeName] [varchar](45) NULL,
+	[totalAmount] [float] NULL,
+	[status] [varchar](45) NULL,
+	[vatPercentage] [float] NULL,
+	[netAmount] [float] NULL,
+	[vatAmount] [float] NULL,
+	[service_id] [int] NULL,
+	[propertyType_id] [int] NULL,
+	[unitPrice] [float] NULL,
+	[propertySize_id] [int] NULL,
+	[location] [varchar](50) NULL,
+ CONSTRAINT [PK_CartItems] PRIMARY KEY CLUSTERED 
+(
+	[cartBooking_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[city]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[city](
+	[city_id] [int] IDENTITY(1,1) NOT NULL,
+	[cityName] [varchar](45) NULL,
+	[cityCode] [varchar](45) NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[createdBy] [varchar](45) NULL,
+	[modifiedBy] [varchar](45) NULL,
+ CONSTRAINT [PK_city] PRIMARY KEY CLUSTERED 
+(
+	[city_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[country]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[country](
+	[country_id] [int] IDENTITY(1,1) NOT NULL,
+	[countryName] [varchar](45) NULL,
+	[created_ts] [datetime] NULL,
+	[createdBy] [varchar](45) NULL,
+	[modifiedBy] [varchar](45) NULL,
+	[modified_ts] [datetime] NULL,
+	[status] [varchar](50) NULL,
+ CONSTRAINT [PK_country] PRIMARY KEY CLUSTERED 
+(
+	[country_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[customer_identification]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[customer_identification](
+	[customer_id] [int] NOT NULL,
+	[propertyName] [varchar](50) NULL,
+	[LocationName] [varchar](50) NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[customerRating]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[customerRating](
+	[rating_id] [int] IDENTITY(1,1) NOT NULL,
+	[booking_id] [int] NOT NULL,
+	[rating] [float] NULL,
+	[comments] [varchar](512) NULL,
+	[orderReference] [varchar](255) NULL,
+ CONSTRAINT [PK_customerRating] PRIMARY KEY CLUSTERED 
+(
+	[rating_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[customerType]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[customerType](
+	[id] [int] IDENTITY(1000,1) NOT NULL,
+	[customer_id] [int] NOT NULL,
+	[application] [varchar](50) NULL,
+ CONSTRAINT [PK_customerType] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[customResponse]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[customResponse](
+	[response_id] [int] IDENTITY(1,1) NOT NULL,
+	[responseCode] [varchar](50) NULL,
+	[responseDescription] [varchar](max) NULL,
+	[responseMessage] [varchar](512) NULL,
+	[responseStatusCode] [int] NULL,
+ CONSTRAINT [PK_customErrorCode] PRIMARY KEY CLUSTERED 
+(
+	[response_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[dataMigration]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[dataMigration](
+	[migration_id] [int] IDENTITY(1000,1) NOT NULL,
+	[row] [varchar](50) NULL,
+	[emailId] [varchar](50) NULL,
+	[mobileNumber] [varchar](50) NULL,
+	[CompanyEmailId] [varchar](50) NULL,
+	[CompanyPhoneNumber] [varchar](50) NULL,
+	[status] [varchar](50) NULL,
+	[reasonForFailure] [varchar](50) NULL,
+	[fileName] [varchar](50) NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_dataMigration] PRIMARY KEY CLUSTERED 
+(
+	[migration_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[dataMigrationForCustomer]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[dataMigrationForCustomer](
+	[id] [float] NULL,
+	[typeOfOccupancy] [nvarchar](255) NULL,
+	[CompanyStatus] [nvarchar](255) NULL,
+	[trnNumber] [nvarchar](255) NULL,
+	[firstName] [nvarchar](255) NULL,
+	[lastName] [nvarchar](255) NULL,
+	[mobileNumber] [float] NULL,
+	[emailId] [nvarchar](255) NULL,
+	[address] [nvarchar](255) NULL,
+	[poBox] [float] NULL,
+	[country] [nvarchar](255) NULL,
+	[city] [nvarchar](255) NULL,
+	[password] [nvarchar](255) NULL,
+	[CompanyName] [nvarchar](255) NULL,
+	[companyEmailId] [nvarchar](255) NULL,
+	[companyMobileNumber] [float] NULL,
+	[title] [nvarchar](255) NULL,
+	[status] [varchar](max) NULL,
+	[migrationStatus] [varchar](100) NULL,
+	[application] [varchar](50) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[dataMigrationForCustomer1]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[dataMigrationForCustomer1](
+	[id] [nvarchar](255) NULL,
+	[typeOfOccupancy] [nvarchar](255) NULL,
+	[CompanyStatus] [nvarchar](255) NULL,
+	[trnNumber] [nvarchar](255) NULL,
+	[firstName] [nvarchar](255) NULL,
+	[lastName] [nvarchar](255) NULL,
+	[mobileNumber] [nvarchar](255) NULL,
+	[emailId] [nvarchar](255) NULL,
+	[address] [nvarchar](255) NULL,
+	[poBox] [nvarchar](255) NULL,
+	[country] [nvarchar](255) NULL,
+	[city] [nvarchar](255) NULL,
+	[password] [nvarchar](255) NULL,
+	[CompanyName] [nvarchar](255) NULL,
+	[companyEmailId] [nvarchar](255) NULL,
+	[companyMobileNumber] [nvarchar](255) NULL,
+	[title] [nvarchar](255) NULL,
+	[status] [nvarchar](255) NULL,
+	[migrationStatus] [nvarchar](255) NULL,
+	[application] [nvarchar](255) NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[department]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[department](
+	[department_id] [int] IDENTITY(1,1) NOT NULL,
+	[departmentName] [varchar](45) NULL,
+	[active] [tinyint] NULL,
+	[defaultDepartment] [bit] NULL,
+ CONSTRAINT [PK_department] PRIMARY KEY CLUSTERED 
+(
+	[department_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[EmailQueue_Attachment_Mapping]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[EmailQueue_Attachment_Mapping](
+	[Id] [int] NOT NULL,
+	[EmailQueueId] [int] NOT NULL,
+	[Attachment] [varbinary](max) NULL,
+	[AttachmentName] [varchar](255) NULL,
+ CONSTRAINT [PK_EmailQueue_Attachment_Mapping] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[exception]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[exception](
+	[exception_id] [int] IDENTITY(1,1) NOT NULL,
+	[exceptionName] [varchar](max) NULL,
+	[controller] [varchar](max) NULL,
+	[url] [varchar](max) NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_exception] PRIMARY KEY CLUSTERED 
+(
+	[exception_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[financeReport]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[financeReport](
+	[Id] [int] IDENTITY(1000,1) NOT NULL,
+	[transactionDate] [varchar](50) NULL,
+	[AccountType] [varchar](45) NULL,
+	[accountCode] [varchar](50) NULL,
+	[text] [varchar](255) NULL,
+	[debit] [varchar](50) NULL,
+	[credit] [varchar](50) NULL,
+	[offsetAccountType] [varchar](50) NULL,
+	[offsetAccountCode] [varchar](50) NULL,
+	[businessStream] [varchar](50) NULL,
+	[department] [varchar](50) NULL,
+	[Employee] [varchar](50) NULL,
+	[jobNumber] [varchar](50) NULL,
+	[properties] [varchar](50) NULL,
+	[relatedParty] [varchar](50) NULL,
+	[invoiceNo] [varchar](50) NULL,
+	[depositslip] [varchar](50) NULL,
+	[paymentReference] [varchar](255) NULL,
+	[companyCode] [varchar](50) NULL,
+	[offsetcompanyCode] [varchar](50) NULL,
+	[invoicestartDate] [datetime] NULL,
+	[invoiceEndDate] [datetime] NULL,
+	[approver] [varchar](50) NULL,
+	[vatPostingGroup] [varchar](50) NULL,
+	[vatItemPostingGroup] [varchar](50) NULL,
+	[contatctNo_TradeLicenseNoIFM] [varchar](50) NULL,
+	[nameofContact] [varchar](50) NULL,
+	[vatTRNnumber] [varchar](50) NULL,
+	[address] [varchar](max) NULL,
+	[city] [varchar](50) NULL,
+	[phoneNumber] [varchar](50) NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_financeReport] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[highestServicePrice]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[highestServicePrice](
+	[Highestprice_id] [int] NOT NULL,
+	[HighestMeasurement] [varchar](50) NULL,
+	[HighestPrice] [float] NULL,
+	[service_id] [int] NULL,
+	[propertyType_id] [int] NULL,
+	[propertySize_id] [int] NULL,
+	[active] [tinyint] NULL,
+ CONSTRAINT [PK_HighestServicePrice] PRIMARY KEY CLUSTERED 
+(
+	[Highestprice_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[highestServicePriceWorkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[highestServicePriceWorkflow](
+	[Highestprice_id] [int] IDENTITY(1,1) NOT NULL,
+	[HighestMeasurement] [varchar](50) NULL,
+	[HighestPrice] [float] NULL,
+	[service_id] [int] NULL,
+	[propertyType_id] [int] NULL,
+	[propertySize_id] [int] NULL,
+	[status] [varchar](50) NULL,
+	[id] [int] NULL,
+	[active] [tinyint] NULL,
+	[action] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_highestServicePriceWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[Highestprice_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[historyCommonLanding]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[historyCommonLanding](
+	[id] [int] NOT NULL,
+	[phoneNumber] [bigint] NULL,
+	[email] [varchar](50) NULL,
+	[homeContent] [text] NULL,
+	[address] [varchar](255) NULL,
+	[describiton] [text] NULL,
+	[workflow_aprovals] [varchar](50) NULL,
+	[headercontent1] [text] NULL,
+	[headercontent2] [text] NULL,
+	[content_migration] [varchar](50) NULL,
+ CONSTRAINT [PK_history_commonLandingTable] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[historyService]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[historyService](
+	[id] [int] NOT NULL,
+	[imagepath] [varchar](50) NULL,
+	[serviceName] [varchar](50) NULL,
+	[rate] [float] NULL,
+	[service] [varchar](50) NULL,
+	[describiton] [text] NULL,
+	[readMore] [text] NULL,
+	[workflow_aprovals] [varchar](50) NULL,
+	[content_migration] [varchar](50) NULL,
+ CONSTRAINT [PK_history_serviceTable] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[invoiceItems]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[invoiceItems](
+	[invoiceItem_id] [int] IDENTITY(1,1) NOT NULL,
+	[description] [varchar](255) NULL,
+	[quantity] [varchar](50) NULL,
+	[unitPrice] [float] NULL,
+	[discountAmount] [float] NULL,
+	[netAmount] [float] NULL,
+	[vatRate] [float] NULL,
+	[vatAmount] [float] NULL,
+	[totalAmount] [float] NULL,
+	[invoice_id] [int] NULL,
+ CONSTRAINT [PK_invoiceItems_1] PRIMARY KEY CLUSTERED 
+(
+	[invoiceItem_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[listOfHolidays]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[listOfHolidays](
+	[Holiday_id] [int] IDENTITY(1,1) NOT NULL,
+	[HolidayDate] [date] NULL,
+	[created_ts] [datetime] NULL,
+	[flag] [int] NULL,
+ CONSTRAINT [PK_ListOfHolidays] PRIMARY KEY CLUSTERED 
+(
+	[Holiday_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[listOfHolidaysWorkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[listOfHolidaysWorkflow](
+	[request_id] [int] IDENTITY(1000,1) NOT NULL,
+	[Holiday_id] [int] NULL,
+	[HolidayDate] [date] NULL,
+	[status] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[publisher] [varchar](50) NULL,
+	[statusActionDate] [datetime] NULL,
+	[comments] [varchar](max) NULL,
+	[oldContent] [varchar](max) NULL,
+	[action] [varchar](50) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_holidayWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[request_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[mailer]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[mailer](
+	[mailer_id] [int] IDENTITY(1000,1) NOT NULL,
+	[mail_type] [varchar](50) NULL,
+	[mailBody] [text] NULL,
+	[mailSubject] [varchar](50) NULL,
+	[flag] [int] NULL,
+ CONSTRAINT [PK_mailer] PRIMARY KEY CLUSTERED 
+(
+	[mailer_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[mailerWorkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[mailerWorkflow](
+	[request_id] [int] IDENTITY(1000,1) NOT NULL,
+	[mail_type] [varchar](50) NULL,
+	[mailBody] [text] NULL,
+	[mailSubject] [varchar](50) NULL,
+	[status] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[publisher] [varchar](50) NULL,
+	[statusActionDate] [datetime] NULL,
+	[comments] [varchar](50) NULL,
+	[oldContent] [varchar](max) NULL,
+	[action] [varchar](50) NULL,
+	[mailer_id] [varchar](50) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_mailerWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[request_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[measurementLables]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[measurementLables](
+	[measurementTypeName_id] [int] IDENTITY(1,1) NOT NULL,
+	[measurementTypeName] [varchar](50) NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_MeasurementLables] PRIMARY KEY CLUSTERED 
+(
+	[measurementTypeName_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[offerNewsSubscription]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[offerNewsSubscription](
+	[subscription_id] [int] IDENTITY(1,1) NOT NULL,
+	[emailId] [varchar](45) NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_offerNewsSubscription] PRIMARY KEY CLUSTERED 
+(
+	[subscription_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[opsquotationtype]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[opsquotationtype](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[quotationName] [varchar](50) NULL,
+ CONSTRAINT [PK_opsquotationtype] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[opsreporttype]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[opsreporttype](
+	[report_id] [int] NOT NULL,
+	[reporttype] [varchar](50) NULL,
+ CONSTRAINT [PK_reportname] PRIMARY KEY CLUSTERED 
+(
+	[report_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Picture]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Picture](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[FileName] [nvarchar](max) NULL,
+	[FileType] [nvarchar](200) NULL,
+	[Src] [nvarchar](max) NULL,
+	[ClearUrl] [nvarchar](max) NULL,
+	[EncryptedUrl] [nvarchar](max) NULL,
+	[Size] [numeric](18, 2) NULL,
+	[DisplayOrder] [int] NULL,
+	[IsActive] [bit] NULL,
+	[Title] [nvarchar](max) NULL,
+	[Type] [nvarchar](max) NULL,
+	[IconSrc] [nvarchar](max) NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[UserId] [int] NULL,
+ CONSTRAINT [PK_Picture] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PillarServices]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PillarServices](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[title] [varchar](255) NULL,
+	[hoverLink] [varchar](255) NULL,
+	[pictureId] [int] NOT NULL,
+	[identification] [varchar](255) NULL,
+	[cartbodycontent] [varchar](255) NULL,
+	[cartbodycontent1] [varchar](255) NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[active] [bit] NULL,
+ CONSTRAINT [PK_PillarServices] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PillarServicesWorkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PillarServicesWorkflow](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[title] [varchar](255) NULL,
+	[hoverLink] [varchar](255) NULL,
+	[pictureId] [int] NULL,
+	[requestedDate] [datetime] NULL,
+	[status] [varchar](50) NULL,
+	[statusActionDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[publisher] [varchar](50) NULL,
+	[comments] [varchar](255) NULL,
+	[modifiedDate] [datetime] NULL,
+	[active] [bit] NULL,
+	[requestId] [int] NOT NULL,
+	[record] [varchar](15) NULL,
+	[identification] [varchar](255) NULL,
+	[cartbodycontent] [varchar](255) NULL,
+	[cartbodycontent1] [varchar](255) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_PillarServicesWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[priceOffering]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[priceOffering](
+	[pricing_id] [int] IDENTITY(1,1) NOT NULL,
+	[propertyType_id] [int] NOT NULL,
+	[service_id] [int] NOT NULL,
+	[propertySize_id] [int] NOT NULL,
+	[measurementTypeName_id] [int] NULL,
+	[measurementType] [varchar](45) NULL,
+	[price] [float] NULL,
+	[active] [tinyint] NULL,
+ CONSTRAINT [PK_priceOffering] PRIMARY KEY CLUSTERED 
+(
+	[pricing_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[priceOfferingWorkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[priceOfferingWorkflow](
+	[pricing_id] [int] IDENTITY(1,1) NOT NULL,
+	[propertyType_id] [int] NULL,
+	[service_id] [int] NULL,
+	[propertySize_id] [int] NULL,
+	[measurementTypeName_id] [int] NULL,
+	[measurementType] [varchar](45) NULL,
+	[price] [float] NULL,
+	[status] [varchar](50) NULL,
+	[id] [int] NULL,
+	[active] [tinyint] NULL,
+	[action] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_priceOfferingWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[pricing_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[promoCode]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[promoCode](
+	[promo_id] [int] IDENTITY(1,1) NOT NULL,
+	[service_id] [int] NOT NULL,
+	[promoCode] [varchar](45) NULL,
+	[discountPercent] [float] NULL,
+	[discountAmount] [float] NULL,
+	[expiryDate] [datetime] NULL,
+	[active] [tinyint] NULL,
+	[isDiscountPercent] [bit] NULL,
+ CONSTRAINT [PK_promoCode] PRIMARY KEY CLUSTERED 
+(
+	[promo_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[promoCodeWorkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[promoCodeWorkflow](
+	[request_id] [int] IDENTITY(1000,1) NOT NULL,
+	[service_id] [int] NULL,
+	[promoCode] [varchar](50) NULL,
+	[discountPercent] [float] NULL,
+	[discountAmount] [float] NULL,
+	[expiryDate] [datetime] NULL,
+	[status] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[publisher] [varchar](50) NULL,
+	[statusActionDate] [datetime] NULL,
+	[oldContent] [varchar](max) NULL,
+	[comments] [varchar](50) NULL,
+	[action] [varchar](50) NULL,
+	[id] [varchar](50) NULL,
+	[user_id] [int] NULL,
+	[isDiscountPercent] [bit] NULL,
+ CONSTRAINT [PK_promoCodeWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[request_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[property]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[property](
+	[prop_id] [int] IDENTITY(1,1) NOT NULL,
+	[service_id] [int] NOT NULL,
+	[property_id] [int] NOT NULL,
+	[active] [tinyint] NULL,
+ CONSTRAINT [PK_property] PRIMARY KEY CLUSTERED 
+(
+	[prop_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[propertySize]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[propertySize](
+	[propertySize_id] [int] IDENTITY(1,1) NOT NULL,
+	[property_id] [int] NOT NULL,
+	[propertySize] [varchar](50) NULL,
+ CONSTRAINT [PK_propertySize] PRIMARY KEY CLUSTERED 
+(
+	[propertySize_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[propertyType]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[propertyType](
+	[property_id] [int] IDENTITY(1,1) NOT NULL,
+	[propertyTypeName] [varchar](45) NULL,
+	[create_ts] [datetime] NULL,
+ CONSTRAINT [PK_propertyType] PRIMARY KEY CLUSTERED 
+(
+	[property_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[propertyworkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[propertyworkflow](
+	[prop_id] [int] IDENTITY(1,1) NOT NULL,
+	[service_id] [int] NOT NULL,
+	[property_id] [int] NOT NULL,
+	[action] [varchar](50) NULL,
+	[status] [varchar](50) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_propertyworkflow] PRIMARY KEY CLUSTERED 
+(
+	[prop_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[QueuedEmail]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[QueuedEmail](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[From] [nvarchar](500) NOT NULL,
+	[FromName] [nvarchar](500) NULL,
+	[To] [nvarchar](500) NOT NULL,
+	[ToName] [nvarchar](500) NULL,
+	[ReplyTo] [nvarchar](500) NULL,
+	[ReplyToName] [nvarchar](500) NULL,
+	[CC] [nvarchar](500) NULL,
+	[Bcc] [nvarchar](500) NULL,
+	[Subject] [nvarchar](1000) NULL,
+	[PriorityId] [int] NOT NULL,
+	[Body] [nvarchar](max) NULL,
+	[CreatedOnUtc] [datetime2](7) NOT NULL,
+	[SentTries] [int] NOT NULL,
+	[SentOnUtc] [datetime2](7) NULL,
+	[IsSent] [bit] NULL,
+ CONSTRAINT [PK_QueuedEmail] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[quotationDetails]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[quotationDetails](
+	[quotationDetail_id] [int] IDENTITY(1,1) NOT NULL,
+	[serviceDescription] [varchar](255) NULL,
+	[quantity] [int] NOT NULL,
+	[unitCost] [float] NULL,
+	[netCost] [float] NULL,
+	[vatPercentage] [float] NULL,
+	[taxAmount] [float] NULL,
+	[totalCost] [float] NULL,
+	[quotation_id] [int] NOT NULL,
+ CONSTRAINT [PK_quotationDetails] PRIMARY KEY CLUSTERED 
+(
+	[quotationDetail_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[refund]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[refund](
+	[refund_id] [int] IDENTITY(1,1) NOT NULL,
+	[invoice_no] [varchar](50) NULL,
+	[invoice_date] [varchar](50) NULL,
+	[contract_no] [varchar](50) NULL,
+	[supply_date] [varchar](50) NULL,
+	[customer_name] [varchar](255) NULL,
+	[customer_address] [varchar](max) NULL,
+	[customer_trn] [varchar](255) NULL,
+	[payment_terms] [varchar](255) NULL,
+	[job_id] [varchar](50) NULL,
+	[item] [varchar](50) NULL,
+	[description] [varchar](255) NULL,
+	[quantity] [int] NULL,
+	[unit_price] [float] NULL,
+	[net_amount] [float] NULL,
+	[vat_rate] [float] NULL,
+	[vat_amount] [float] NULL,
+	[total_amount] [float] NULL,
+	[refundPaymentReferenceNumber] [varchar](255) NULL,
+	[originalTaxInvoiceNumber] [varchar](50) NULL,
+	[originalTaxInvoiceDate] [varchar](50) NULL,
+	[reasonForCreditNote] [varchar](255) NULL,
+	[creditNoteNumber] [varchar](50) NULL,
+	[originalTaxInvoiceAmount] [float] NULL,
+	[correctTaxInvoiceAmount] [float] NULL,
+	[creditNoteDate] [varchar](50) NULL,
+ CONSTRAINT [PK_refund] PRIMARY KEY CLUSTERED 
+(
+	[refund_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[RefundReports]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RefundReports](
+	[id] [int] IDENTITY(1000,1) NOT NULL,
+	[creditNoteDate] [date] NULL,
+	[description] [varchar](255) NULL,
+	[netAmount] [float] NULL,
+	[vat] [float] NULL,
+	[totalAmountPaid] [float] NULL,
+	[jobNo] [varchar](50) NULL,
+	[creditNoteNumber] [varchar](50) NULL,
+	[paymentReferenceNo] [varchar](255) NULL,
+	[legalEntity] [varchar](50) NULL,
+	[customerName] [varchar](50) NULL,
+	[vatTrnNumber] [varchar](50) NULL,
+	[address] [varchar](max) NULL,
+	[city] [varchar](50) NULL,
+	[created_ts] [datetime] NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[resetPassword]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[resetPassword](
+	[reset_id] [int] IDENTITY(1,1) NOT NULL,
+	[resetToken] [varchar](255) NULL,
+	[expireDateTime] [datetime] NULL,
+	[created_ts] [datetime] NULL,
+	[status] [tinyint] NULL,
+	[customer_id] [int] NULL,
+ CONSTRAINT [PK_resetpassword] PRIMARY KEY CLUSTERED 
+(
+	[reset_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[role]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[role](
+	[role_id] [int] IDENTITY(1,1) NOT NULL,
+	[roleName] [varchar](45) NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[createdBy] [varchar](45) NULL,
+	[modifiedBy] [varchar](45) NULL,
+	[permission] [varchar](45) NULL,
+ CONSTRAINT [PK_role] PRIMARY KEY CLUSTERED 
+(
+	[role_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[roleAccess]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[roleAccess](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[department_id] [int] NOT NULL,
+	[role_id] [varchar](50) NOT NULL,
+	[active] [tinyint] NULL,
+ CONSTRAINT [PK_roleAccess] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[RolePermissions]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RolePermissions](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[screenid] [int] NULL,
+	[department_id] [int] NULL,
+	[role_id] [int] NULL,
+	[createAccess] [bit] NULL,
+	[deleteAccess] [bit] NULL,
+	[viewAccess] [bit] NULL,
+	[updateAccess] [bit] NULL,
+ CONSTRAINT [PK_RolePermissions] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[salesReport]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[salesReport](
+	[Id] [int] IDENTITY(1000,1) NOT NULL,
+	[invoiceDate] [varchar](50) NULL,
+	[description] [varchar](255) NULL,
+	[netAmount] [varchar](50) NULL,
+	[vat] [varchar](50) NULL,
+	[totalAmount] [varchar](50) NULL,
+	[jobNo] [varchar](50) NULL,
+	[invoiceNo] [varchar](50) NULL,
+	[paymentRefNo] [varchar](255) NULL,
+	[legalEntity] [varchar](45) NULL,
+	[customerName] [varchar](45) NULL,
+	[vatTrnNumber] [varchar](50) NULL,
+	[address] [varchar](max) NULL,
+	[city] [varchar](45) NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_salesReport] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ScheduledTask]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ScheduledTask](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](500) NOT NULL,
+	[Seconds] [int] NOT NULL,
+	[Enabled] [bit] NOT NULL,
+	[StopOnError] [bit] NULL,
+	[LastDate] [datetime] NULL,
+	[Type] [nvarchar](max) NOT NULL,
+	[LastStartUtc] [datetime] NULL,
+	[LastEndUtc] [datetime] NULL,
+	[LastSuccessUtc] [datetime] NULL,
+ CONSTRAINT [PK_ScheduledTask] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Screens]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Screens](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ScreenName] [varchar](150) NULL,
+ CONSTRAINT [PK_Screens] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[searchIndex]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[searchIndex](
+	[serachIndex_id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](255) NULL,
+	[Keywords] [varchar](max) NULL,
+	[Description] [varchar](max) NULL,
+	[Url] [varchar](1024) NULL,
+	[Type] [varchar](50) NULL,
+ CONSTRAINT [PK_searchIndex] PRIMARY KEY CLUSTERED 
+(
+	[serachIndex_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[service]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[service](
+	[service_id] [int] IDENTITY(1,1) NOT NULL,
+	[serviceCode] [varchar](45) NULL,
+	[serviceName] [varchar](255) NULL,
+	[numberOfTeam] [int] NOT NULL,
+	[description] [text] NULL,
+	[policy] [text] NULL,
+	[metaTitle] [varchar](255) NULL,
+	[metaKeyword] [varchar](255) NULL,
+	[metaDescription] [text] NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[preferedDateCount] [int] NULL,
+	[vatPercentage] [float] NULL,
+	[flag] [tinyint] NULL,
+	[preffered_date_count] [int] NULL,
+	[Timeconstarint_in_hours] [varchar](50) NULL,
+	[status] [varchar](45) NULL,
+	[serviceCategory] [varchar](50) NULL,
+	[contractSequence] [int] NULL,
+	[contractCode] [varchar](50) NULL,
+	[contractTitle] [varchar](255) NULL,
+	[jobIdCode] [varchar](50) NULL,
+	[Keywords] [varchar](max) NULL,
+	[Url] [varchar](max) NULL,
+	[Image] [varchar](max) NULL,
+	[active] [tinyint] NULL,
+ CONSTRAINT [PK_service] PRIMARY KEY CLUSTERED 
+(
+	[service_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[servicecategory]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[servicecategory](
+	[category_id] [int] IDENTITY(1,1) NOT NULL,
+	[categoryname] [varchar](255) NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+ CONSTRAINT [PK_servicecategory] PRIMARY KEY CLUSTERED 
+(
+	[category_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[serviceworkflow]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[serviceworkflow](
+	[service_id] [int] IDENTITY(1,1) NOT NULL,
+	[requestDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[publisher] [varchar](50) NULL,
+	[statusActionDate] [datetime] NULL,
+	[serviceCode] [varchar](45) NULL,
+	[serviceName] [varchar](255) NULL,
+	[numberOfTeam] [int] NULL,
+	[description] [text] NULL,
+	[policy] [text] NULL,
+	[metaTitle] [varchar](255) NULL,
+	[metaKeyword] [varchar](255) NULL,
+	[metaDescription] [text] NULL,
+	[created_ts] [datetime] NULL,
+	[modified_ts] [datetime] NULL,
+	[preferedDateCount] [int] NULL,
+	[vatPercentage] [float] NULL,
+	[flag] [tinyint] NULL,
+	[preffered_date_count] [int] NULL,
+	[Timeconstarint_in_hours] [varchar](50) NULL,
+	[status] [varchar](45) NULL,
+	[serviceCategory] [varchar](50) NULL,
+	[contractSequence] [int] NULL,
+	[contractCode] [varchar](50) NULL,
+	[contractTitle] [varchar](255) NULL,
+	[jobIdCode] [varchar](50) NULL,
+	[Keywords] [varchar](max) NULL,
+	[Url] [varchar](max) NULL,
+	[id] [int] NULL,
+	[active] [tinyint] NULL,
+	[action] [varchar](50) NULL,
+	[image] [int] NULL,
+	[comments] [varchar](255) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_serviceworkflow] PRIMARY KEY CLUSTERED 
+(
+	[service_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[session]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[session](
+	[session_id] [int] IDENTITY(1,1) NOT NULL,
+	[customer_id] [int] NOT NULL,
+	[customerIdentity] [varchar](255) NULL,
+	[data] [varchar](max) NULL,
+	[expireDateTime] [datetime] NULL,
+	[status] [varchar](50) NULL,
+ CONSTRAINT [PK_session] PRIMARY KEY CLUSTERED 
+(
+	[session_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[slotAssigned]    Script Date: 28-09-2021 19:21:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[slotAssigned](
+	[slotassigned_id] [int] IDENTITY(1,1) NOT NULL,
+	[service_id] [int] NULL,
+	[date] [date] NULL,
+	[timeslot] [varchar](255) NULL,
+	[currentbookingslot] [int] NULL,
+ CONSTRAINT [PK_slotassigned] PRIMARY KEY CLUSTERED 
+(
+	[slotassigned_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[specificLocation]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[specificLocation](
+	[id] [int] IDENTITY(1000,1) NOT NULL,
+	[emailId] [varchar](50) NULL,
+	[location] [varchar](50) NULL,
+	[created_ts] [datetime] NULL,
+ CONSTRAINT [PK_serviceEnqiry] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[staticConfiguration]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[staticConfiguration](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[linkName] [varchar](45) NULL,
+	[componentName] [varchar](45) NULL,
+	[functionalConfig] [varchar](45) NULL,
+	[keys] [varchar](45) NULL,
+	[value] [varchar](max) NULL,
+ CONSTRAINT [PK_staticConfigurations] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[staticContentWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[staticContentWorkflow](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[pageName] [varchar](50) NULL,
+	[componentName] [varchar](50) NULL,
+	[functionalConfig] [varchar](50) NULL,
+	[keys] [varchar](50) NULL,
+	[value] [varchar](max) NULL,
+	[oldContent] [varchar](max) NULL,
+	[status] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[statusActionDate] [datetime] NULL,
+	[publisher] [varchar](50) NULL,
+	[author] [varchar](50) NULL,
+	[comments] [varchar](50) NULL,
+	[modifiedDate] [datetime] NULL,
+	[requestId] [int] NOT NULL,
+	[active] [bit] NULL,
+	[user_id] [int] NULL,
+	[isImage] [bit] NULL,
+ CONSTRAINT [PK__staticCo__3213E83FD5A72FD7] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[timeslotConfig]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[timeslotConfig](
+	[timeslotConfigId] [int] IDENTITY(1,1) NOT NULL,
+	[created_ts] [datetime] NULL,
+	[service_id] [int] NULL,
+	[slotRange] [varchar](45) NULL,
+	[active] [tinyint] NULL,
+ CONSTRAINT [PK_timeslotConfig] PRIMARY KEY CLUSTERED 
+(
+	[timeslotConfigId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[timeslotWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[timeslotWorkflow](
+	[timeslotConfigId] [int] IDENTITY(1,1) NOT NULL,
+	[created_ts] [datetime] NULL,
+	[service_id] [int] NULL,
+	[slotRange] [varchar](45) NULL,
+	[status] [varchar](50) NULL,
+	[id] [int] NULL,
+	[action] [varchar](50) NULL,
+	[active] [tinyint] NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_timeslotWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[timeslotConfigId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[upsellMapping]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[upsellMapping](
+	[upsell_mapping_id] [int] IDENTITY(1,1) NOT NULL,
+	[bundle_id] [int] NOT NULL,
+	[service_id] [int] NOT NULL,
+	[flag] [int] NULL,
+ CONSTRAINT [PK_upsell_mapping] PRIMARY KEY CLUSTERED 
+(
+	[upsell_mapping_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[upsellMappingWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[upsellMappingWorkflow](
+	[request_id] [int] IDENTITY(1000,1) NOT NULL,
+	[upsell_mapping_id] [int] NULL,
+	[bundle_id] [int] NULL,
+	[service_id] [varchar](50) NULL,
+	[status] [varchar](50) NULL,
+	[requestedDate] [datetime] NULL,
+	[author] [varchar](50) NULL,
+	[publisher] [varchar](50) NULL,
+	[statusActionDate] [datetime] NULL,
+	[comments] [varchar](max) NULL,
+	[oldContent] [varchar](max) NULL,
+	[action] [varchar](50) NULL,
+	[user_id] [int] NULL,
+ CONSTRAINT [PK_upsellMappingWorkflow] PRIMARY KEY CLUSTERED 
+(
+	[request_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[address]  WITH CHECK ADD  CONSTRAINT [FK_address_customer] FOREIGN KEY([customer_id])
+REFERENCES [dbo].[customer] ([customer_id])
+GO
+ALTER TABLE [dbo].[address] CHECK CONSTRAINT [FK_address_customer]
+GO
+ALTER TABLE [dbo].[AdminresetPassword]  WITH CHECK ADD  CONSTRAINT [FK_AdminresetPassword_backendEndUser] FOREIGN KEY([user_id])
+REFERENCES [dbo].[backendEndUser] ([user_id])
+GO
+ALTER TABLE [dbo].[AdminresetPassword] CHECK CONSTRAINT [FK_AdminresetPassword_backendEndUser]
+GO
+ALTER TABLE [dbo].[AdminSession]  WITH CHECK ADD  CONSTRAINT [FK_AdminSession_backendEndUser] FOREIGN KEY([user_id])
+REFERENCES [dbo].[backendEndUser] ([user_id])
+GO
+ALTER TABLE [dbo].[AdminSession] CHECK CONSTRAINT [FK_AdminSession_backendEndUser]
+GO
+ALTER TABLE [dbo].[backendEndUser]  WITH CHECK ADD  CONSTRAINT [FK_backendEndUser_department] FOREIGN KEY([department_id])
+REFERENCES [dbo].[department] ([department_id])
+GO
+ALTER TABLE [dbo].[backendEndUser] CHECK CONSTRAINT [FK_backendEndUser_department]
+GO
+ALTER TABLE [dbo].[backendEndUser]  WITH CHECK ADD  CONSTRAINT [FK_backendEndUser_role] FOREIGN KEY([role_id])
+REFERENCES [dbo].[role] ([role_id])
+GO
+ALTER TABLE [dbo].[backendEndUser] CHECK CONSTRAINT [FK_backendEndUser_role]
+GO
+ALTER TABLE [dbo].[CarousalWorkflow]  WITH CHECK ADD  CONSTRAINT [FK_CarousalWorkflow_Picture] FOREIGN KEY([pictureId])
+REFERENCES [dbo].[Picture] ([Id])
+GO
+ALTER TABLE [dbo].[CarousalWorkflow] CHECK CONSTRAINT [FK_CarousalWorkflow_Picture]
+GO
+ALTER TABLE [dbo].[cart]  WITH CHECK ADD  CONSTRAINT [FK_cart_CartItems] FOREIGN KEY([cartBooking_id])
+REFERENCES [dbo].[cartItems] ([cartBooking_id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[cart] CHECK CONSTRAINT [FK_cart_CartItems]
+GO
+ALTER TABLE [dbo].[cart]  WITH CHECK ADD  CONSTRAINT [FK_cart_customer] FOREIGN KEY([customer_id])
+REFERENCES [dbo].[customer] ([customer_id])
+GO
+ALTER TABLE [dbo].[cart] CHECK CONSTRAINT [FK_cart_customer]
+GO
+ALTER TABLE [dbo].[customerRating]  WITH CHECK ADD  CONSTRAINT [FK_customerRating_jobBooking] FOREIGN KEY([booking_id])
+REFERENCES [dbo].[jobBooking] ([booking_id])
+GO
+ALTER TABLE [dbo].[customerRating] CHECK CONSTRAINT [FK_customerRating_jobBooking]
+GO
+ALTER TABLE [dbo].[EmailQueue_Attachment_Mapping]  WITH CHECK ADD  CONSTRAINT [FK_EmailQueue_Attachment_Mapping_QueuedEmail] FOREIGN KEY([Id])
+REFERENCES [dbo].[QueuedEmail] ([Id])
+GO
+ALTER TABLE [dbo].[EmailQueue_Attachment_Mapping] CHECK CONSTRAINT [FK_EmailQueue_Attachment_Mapping_QueuedEmail]
+GO
+ALTER TABLE [dbo].[invoiceDetailMapping]  WITH CHECK ADD  CONSTRAINT [FK_invoiceDetailMapping_invoice] FOREIGN KEY([invoice_id])
+REFERENCES [dbo].[invoice] ([invoice_id])
+GO
+ALTER TABLE [dbo].[invoiceDetailMapping] CHECK CONSTRAINT [FK_invoiceDetailMapping_invoice]
+GO
+ALTER TABLE [dbo].[invoiceDetailMapping]  WITH CHECK ADD  CONSTRAINT [FK_invoiceDetailMapping_jobBooking] FOREIGN KEY([job_id])
+REFERENCES [dbo].[jobBooking] ([booking_id])
+GO
+ALTER TABLE [dbo].[invoiceDetailMapping] CHECK CONSTRAINT [FK_invoiceDetailMapping_jobBooking]
+GO
+ALTER TABLE [dbo].[invoiceDetailMapping]  WITH CHECK ADD  CONSTRAINT [FK_invoiceDetailMapping_quotation] FOREIGN KEY([quotation_id])
+REFERENCES [dbo].[quotation] ([quotation_id])
+GO
+ALTER TABLE [dbo].[invoiceDetailMapping] CHECK CONSTRAINT [FK_invoiceDetailMapping_quotation]
+GO
+ALTER TABLE [dbo].[invoiceItems]  WITH CHECK ADD  CONSTRAINT [FK_invoiceItems_invoice] FOREIGN KEY([invoice_id])
+REFERENCES [dbo].[invoice] ([invoice_id])
+GO
+ALTER TABLE [dbo].[invoiceItems] CHECK CONSTRAINT [FK_invoiceItems_invoice]
+GO
+ALTER TABLE [dbo].[jobBooking]  WITH CHECK ADD  CONSTRAINT [FK_jobBooking_customer] FOREIGN KEY([customer_id])
+REFERENCES [dbo].[customer] ([customer_id])
+GO
+ALTER TABLE [dbo].[jobBooking] CHECK CONSTRAINT [FK_jobBooking_customer]
+GO
+ALTER TABLE [dbo].[jobBooking]  WITH CHECK ADD  CONSTRAINT [FK_jobBooking_jobidQuotationMapping] FOREIGN KEY([jobidQuotationMapping_id])
+REFERENCES [dbo].[jobidQuotationMapping] ([jobidQuotationMapping_id])
+GO
+ALTER TABLE [dbo].[jobBooking] CHECK CONSTRAINT [FK_jobBooking_jobidQuotationMapping]
+GO
+ALTER TABLE [dbo].[jobBooking]  WITH CHECK ADD  CONSTRAINT [FK_jobBooking_location] FOREIGN KEY([location_id])
+REFERENCES [dbo].[location] ([location_id])
+GO
+ALTER TABLE [dbo].[jobBooking] CHECK CONSTRAINT [FK_jobBooking_location]
+GO
+ALTER TABLE [dbo].[jobidQuotationMapping]  WITH CHECK ADD  CONSTRAINT [FK_jobidQuotationMapping_quotation] FOREIGN KEY([quotation_id])
+REFERENCES [dbo].[quotation] ([quotation_id])
+GO
+ALTER TABLE [dbo].[jobidQuotationMapping] CHECK CONSTRAINT [FK_jobidQuotationMapping_quotation]
+GO
+ALTER TABLE [dbo].[PillarServicesWorkflow]  WITH CHECK ADD  CONSTRAINT [FK_PillarServicesWorkflow_Picture] FOREIGN KEY([pictureId])
+REFERENCES [dbo].[Picture] ([Id])
+GO
+ALTER TABLE [dbo].[PillarServicesWorkflow] CHECK CONSTRAINT [FK_PillarServicesWorkflow_Picture]
+GO
+ALTER TABLE [dbo].[PillarServicesWorkflow]  WITH CHECK ADD  CONSTRAINT [FK_PillarServicesWorkflow_PillarServicesWorkflow] FOREIGN KEY([Id])
+REFERENCES [dbo].[PillarServicesWorkflow] ([Id])
+GO
+ALTER TABLE [dbo].[PillarServicesWorkflow] CHECK CONSTRAINT [FK_PillarServicesWorkflow_PillarServicesWorkflow]
+GO
+ALTER TABLE [dbo].[priceOffering]  WITH CHECK ADD  CONSTRAINT [FK_priceOffering_propertySize] FOREIGN KEY([propertySize_id])
+REFERENCES [dbo].[propertySize] ([propertySize_id])
+GO
+ALTER TABLE [dbo].[priceOffering] CHECK CONSTRAINT [FK_priceOffering_propertySize]
+GO
+ALTER TABLE [dbo].[priceOffering]  WITH CHECK ADD  CONSTRAINT [FK_priceOffering_propertyType] FOREIGN KEY([propertyType_id])
+REFERENCES [dbo].[propertyType] ([property_id])
+GO
+ALTER TABLE [dbo].[priceOffering] CHECK CONSTRAINT [FK_priceOffering_propertyType]
+GO
+ALTER TABLE [dbo].[priceOffering]  WITH CHECK ADD  CONSTRAINT [FK_priceOffering_service] FOREIGN KEY([service_id])
+REFERENCES [dbo].[service] ([service_id])
+GO
+ALTER TABLE [dbo].[priceOffering] CHECK CONSTRAINT [FK_priceOffering_service]
+GO
+ALTER TABLE [dbo].[quotationDetails]  WITH CHECK ADD  CONSTRAINT [FK_quotationDetails_quotation] FOREIGN KEY([quotation_id])
+REFERENCES [dbo].[quotation] ([quotation_id])
+GO
+ALTER TABLE [dbo].[quotationDetails] CHECK CONSTRAINT [FK_quotationDetails_quotation]
+GO
+ALTER TABLE [dbo].[resetPassword]  WITH CHECK ADD  CONSTRAINT [FK_resetpassword_customer] FOREIGN KEY([customer_id])
+REFERENCES [dbo].[customer] ([customer_id])
+GO
+ALTER TABLE [dbo].[resetPassword] CHECK CONSTRAINT [FK_resetpassword_customer]
+GO
+ALTER TABLE [dbo].[RolePermissions]  WITH CHECK ADD  CONSTRAINT [FK_RolePermissions_Screens] FOREIGN KEY([screenid])
+REFERENCES [dbo].[Screens] ([Id])
+GO
+ALTER TABLE [dbo].[RolePermissions] CHECK CONSTRAINT [FK_RolePermissions_Screens]
+GO
+ALTER TABLE [dbo].[serviceItemDetail]  WITH CHECK ADD  CONSTRAINT [FK_serviceitemDetail_jobBooking] FOREIGN KEY([booking_id])
+REFERENCES [dbo].[jobBooking] ([booking_id])
+GO
+ALTER TABLE [dbo].[serviceItemDetail] CHECK CONSTRAINT [FK_serviceitemDetail_jobBooking]
+GO
+ALTER TABLE [dbo].[serviceItemDetail]  WITH CHECK ADD  CONSTRAINT [FK_serviceitemDetail_serviceItems] FOREIGN KEY([serviceBooking_id])
+REFERENCES [dbo].[serviceItems] ([serviceBooking_id])
+GO
+ALTER TABLE [dbo].[serviceItemDetail] CHECK CONSTRAINT [FK_serviceitemDetail_serviceItems]
+GO
+ALTER TABLE [dbo].[session]  WITH CHECK ADD  CONSTRAINT [FK_session_customer] FOREIGN KEY([customer_id])
+REFERENCES [dbo].[customer] ([customer_id])
+GO
+ALTER TABLE [dbo].[session] CHECK CONSTRAINT [FK_session_customer]
+GO
+/****** Object:  StoredProcedure [dbo].[get_ODSCustomerDetails]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create  PROCEDURE [dbo].[get_ODSCustomerDetails]
+ @customerid varchar(100)=null
+as
+begin
+SELECT * from  customer  where customer_id=@customerid
+end
+GO
+/****** Object:  StoredProcedure [dbo].[get_sessionDetails]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create  PROCEDURE [dbo].[get_sessionDetails]
+ @session_id varchar(100)=null
+as
+begin
+SELECT * from  session where [data]=@session_id or [customerIdentity]=@session_id
+end
+GO
+/****** Object:  StoredProcedure [dbo].[spCarousalworkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spCarousalworkflow] 
+
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'id', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[sid] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([sid] )
+	SELECT [U].[id] AS [sid] FROM [dbo].[CarousalWorkflow] [U]
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ( [U].[status] = @status or  @status is NULL )AND ([U].[user_id] =@userId or @userId is NULL )  AND (( [U]. [bannerText] like '%' + @Keyword + '%' OR [U].[buttonText]  like '%' + @Keyword + '%'  ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'bannerText' AND @sortdirection = 'ASC' THEN [U]. [bannerText] END ASC,
+		CASE WHEN @orderby = 'bannerText' AND @sortdirection = 'DESC' THEN [U]. [bannerText] END DESC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U]. [Id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U]. [Id] END DESC 
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[sid] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([sid])
+	SELECT [sid]
+	FROM #DisplayOrderTmp
+	GROUP BY [sid],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+      [COM].[Id],                                            
+       [COM].[requestId],       
+     
+     [COM]. [status],
+    [COM]. [requestedDate],
+    [COM].  [author],
+      [COM].[publisher],
+     [COM]. [statusActionDate],
+    [COM].  [comments],
+     [COM]. [pictureId],
+   [COM].   [modifiedDate],
+    [COM]. [active],
+	[COM].[record]
+
+	
+     
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[CarousalWorkflow] [COM] with (NOLOCK) ON [COM].[id] = [pi].[sid] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spCustomer]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spCustomer] 
+@filter NVARCHAR(200) = NULL, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([CustId]) 
+	SELECT U.[customer_id] AS [CustId] FROM [dbo].[customer] [U] LEFT JOIN [dbo].[address] [a] ON [a].[customer_id] = [U].[customer_id] 
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ([U].[userType] = 'registered user') AND ([U].[emailId] = @filter or @filter is NULL or [U].[mobileNumber] = @filter or [U].[companyEmailId] = @filter or [U].[companyMobileNumber] = @filter  ) AND (( [U].[emailId] like '%' + @Keyword + '%' OR [U].[mobileNumber] like '%' + @Keyword + '%' OR [U].[companyEmailId] like '%' + @Keyword + '%' OR [U].[companyMobileNumber] like '%' + @Keyword + '%') OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'ASC' THEN [U].[firstName] END ASC,
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'DESC' THEN [U].[firstName] END DESC,
+        CASE WHEN @orderby = 'lastName' AND @sortdirection = 'ASC' THEN [U].[lastName] END ASC,
+		CASE WHEN @orderby = 'lastName' AND @sortdirection = 'DESC' THEN [U].[lastName] END DESC,
+		CASE WHEN @orderby = 'emailId' AND @sortdirection = 'ASC' THEN [U].[emailId] END ASC,
+		CASE WHEN @orderby = 'emailId' AND @sortdirection = 'DESC' THEN [U].[emailId] END DESC,
+		CASE WHEN @orderby = 'mobileNo,' AND @sortdirection = 'ASC' THEN [U].[mobileNumber] END ASC,
+		CASE WHEN @orderby = 'mobileNo' AND @sortdirection = 'DESC' THEN [U].[mobileNumber] END DESC,
+		CASE WHEN @orderby = 'created_ts' AND @sortdirection = 'ASC' THEN [U].[created_ts] END ASC,
+		CASE WHEN @orderby = 'created_ts' AND @sortdirection = 'DESC' THEN [U].[created_ts] END DESC,
+		CASE WHEN @orderby = 'trnNumber,' AND @sortdirection = 'ASC' THEN [U].[trnNumber] END ASC,
+		CASE WHEN @orderby = 'trnNumber' AND @sortdirection = 'DESC' THEN [U].[trnNumber] END DESC,
+		CASE WHEN @orderby = 'typeOfOccupancy,' AND @sortdirection = 'ASC' THEN [U].[typeOfOccupancy] END ASC,
+		CASE WHEN @orderby = 'typeOfOccupancy' AND @sortdirection = 'DESC' THEN [U].[typeOfOccupancy] END DESC,
+		CASE WHEN @orderby = 'companyEmailId,' AND @sortdirection = 'ASC' THEN [U].[companyEmailId] END ASC,
+		CASE WHEN @orderby = 'companyEmailId' AND @sortdirection = 'DESC' THEN [U].[companyEmailId] END DESC,
+		CASE WHEN @orderby = 'companyMobileNumber,' AND @sortdirection = 'ASC' THEN [U].[companyMobileNumber] END ASC,
+		CASE WHEN @orderby = 'companyMobileNumber' AND @sortdirection = 'DESC' THEN [U].[companyMobileNumber] END DESC,
+		CASE WHEN @orderby = 'companyStatus,' AND @sortdirection = 'ASC' THEN [U].[CompanyStatus] END ASC,
+		CASE WHEN @orderby = 'companyStatus' AND @sortdirection = 'DESC' THEN [U].[CompanyStatus] END DESC,
+		CASE WHEN @orderby = 'companyName,' AND @sortdirection = 'ASC' THEN [U].[CompanyName] END ASC,
+		CASE WHEN @orderby = 'companyName' AND @sortdirection = 'DESC' THEN [U].[CompanyName] END DESC,
+		CASE WHEN @orderby = 'address,' AND @sortdirection = 'ASC' THEN [a].[address] END ASC,
+		CASE WHEN @orderby = 'address' AND @sortdirection = 'DESC' THEN [a].[address] END DESC,
+		CASE WHEN @orderby = 'city,' AND @sortdirection = 'ASC' THEN [a].[city] END ASC,
+		CASE WHEN @orderby = 'city' AND @sortdirection = 'DESC' THEN [a].[city] END DESC,
+		CASE WHEN @orderby = 'country,' AND @sortdirection = 'ASC' THEN [a].[country] END ASC,
+		CASE WHEN @orderby = 'country' AND @sortdirection = 'DESC' THEN [a].[country] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [CustId]
+	FROM #DisplayOrderTmp
+	GROUP BY [CustId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[customer_id],
+	[COM].[firstName],
+	[COM].[lastName],
+	[COM].[typeOfOccupancy],
+	[COM].[emailId],
+	[COM].[mobileNumber],
+	[COM].[companyEmailId],
+	[COM].[companyMobileNumber],
+	[COM].[CompanyName],
+    [COM].[CompanyStatus],
+	[COM].[title],
+	[COM].[userType],
+	[COM].[trnNumber],
+	[COM].[created_ts],
+	[a].[address],
+	[a].[country],
+	[a].[city],
+	[a].[poBox],
+	[COM].[mobileCode]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[customer] [COM] with (NOLOCK) ON [COM].[customer_id] = [pi].[CustId] LEFT JOIN [dbo].[address] [a] ON [a].[customer_id] = [COM].[customer_id] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spCustomerReport]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spCustomerReport] 
+@fromDate NVARCHAR(200) = '07/07/2021',
+@toDate NVARCHAR(200) = '17/09/2021',
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'date', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	INT = 0,
+@pagesize INT = 1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([CustId]) 
+	SELECT U.[Id] AS [CustId] FROM [dbo].[viewCustomerReports] [U] 
+	WHERE CONVERT(date,[U].[created_ts],103) >= CONVERT(datetime,@fromDate,103) AND CONVERT(date,[U].[created_ts],103)<= CONVERT(datetime,@toDate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	AND (([U].[firstName] like '%' + @Keyword + '%' OR [U].[lastName] like '%' + @Keyword + '%' OR [U].[emailId] like '%' + @Keyword + '%' OR [U].[mobileNumber] like '%' + @Keyword + '%' OR [U].[companyEmailId] like '%' + @Keyword + '%' OR [U].[companyMobileNumber] like '%' + @Keyword + '%') OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY
+		CASE WHEN @orderby = 'date' AND @sortdirection = 'ASC' THEN [U].[created_ts] END ASC,
+		CASE WHEN @orderby = 'date' AND @sortdirection = 'DESC' THEN [U].[created_ts] END DESC,
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'ASC' THEN [U].[firstName] END ASC,
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'DESC' THEN [U].[firstName] END DESC,
+        CASE WHEN @orderby = 'lastName' AND @sortdirection = 'ASC' THEN [U].[lastName] END ASC,
+		CASE WHEN @orderby = 'lastName' AND @sortdirection = 'DESC' THEN [U].[lastName] END DESC,
+		CASE WHEN @orderby = 'emailId' AND @sortdirection = 'ASC' THEN [U].[emailId] END ASC,
+		CASE WHEN @orderby = 'emailId' AND @sortdirection = 'DESC' THEN [U].[emailId] END DESC,
+		CASE WHEN @orderby = 'mobileNo,' AND @sortdirection = 'ASC' THEN [U].[mobileNumber] END ASC,
+		CASE WHEN @orderby = 'mobileNo' AND @sortdirection = 'DESC' THEN [U].[mobileNumber] END DESC,
+		CASE WHEN @orderby = 'created_ts' AND @sortdirection = 'ASC' THEN [U].[created_ts] END ASC,
+		CASE WHEN @orderby = 'created_ts' AND @sortdirection = 'DESC' THEN [U].[created_ts] END DESC,
+		CASE WHEN @orderby = 'trnNumber,' AND @sortdirection = 'ASC' THEN [U].[trnNumber] END ASC,
+		CASE WHEN @orderby = 'trnNumber' AND @sortdirection = 'DESC' THEN [U].[trnNumber] END DESC,
+		CASE WHEN @orderby = 'typeOfOccupancy,' AND @sortdirection = 'ASC' THEN [U].[typeOfOccupancy] END ASC,
+		CASE WHEN @orderby = 'typeOfOccupancy' AND @sortdirection = 'DESC' THEN [U].[typeOfOccupancy] END DESC,
+		CASE WHEN @orderby = 'companyEmailId,' AND @sortdirection = 'ASC' THEN [U].[companyEmailId] END ASC,
+		CASE WHEN @orderby = 'companyEmailId' AND @sortdirection = 'DESC' THEN [U].[companyEmailId] END DESC,
+		CASE WHEN @orderby = 'companyMobileNumber,' AND @sortdirection = 'ASC' THEN [U].[companyMobileNumber] END ASC,
+		CASE WHEN @orderby = 'companyMobileNumber' AND @sortdirection = 'DESC' THEN [U].[companyMobileNumber] END DESC,
+		CASE WHEN @orderby = 'companyStatus,' AND @sortdirection = 'ASC' THEN [U].[CompanyStatus] END ASC,
+		CASE WHEN @orderby = 'companyStatus' AND @sortdirection = 'DESC' THEN [U].[CompanyStatus] END DESC,
+		CASE WHEN @orderby = 'companyName,' AND @sortdirection = 'ASC' THEN [U].[CompanyName] END ASC,
+		CASE WHEN @orderby = 'companyName' AND @sortdirection = 'DESC' THEN [U].[CompanyName] END DESC,
+		CASE WHEN @orderby = 'address,' AND @sortdirection = 'ASC' THEN [U].[address] END ASC,
+		CASE WHEN @orderby = 'address' AND @sortdirection = 'DESC' THEN [U].[address] END DESC,
+		CASE WHEN @orderby = 'city,' AND @sortdirection = 'ASC' THEN [U].[city] END ASC,
+		CASE WHEN @orderby = 'city' AND @sortdirection = 'DESC' THEN [U].[city] END DESC,
+		CASE WHEN @orderby = 'country,' AND @sortdirection = 'ASC' THEN [U].[country] END ASC,
+		CASE WHEN @orderby = 'country' AND @sortdirection = 'DESC' THEN [U].[country] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [CustId]
+	FROM #DisplayOrderTmp
+	GROUP BY [CustId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[Id],
+	[COM].[firstName],
+	[COM].[lastName],
+	[COM].[typeOfOccupancy],
+	[COM].[emailId],
+	[COM].[mobileNumber],
+	[COM].[companyEmailId],
+	[COM].[companyMobileNumber],
+	[COM].[CompanyName],
+    [COM].[CompanyStatus],
+	[COM].[title],
+	[COM].[userType],
+	[COM].[trnNumber],
+	[COM].[created_ts],
+	[COM].[address],
+	[COM].[country],
+	[COM].[city]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[viewCustomerReports] [COM] with (NOLOCK) ON [COM].[Id] = [pi].[CustId]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spDepartmentEmail]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spDepartmentEmail] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[DeptMailId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([DeptMailId]) 
+	SELECT U.[id] AS [DeptMailId] FROM [dbo].[staticConfiguration] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[functionalConfig] = 'deptMail' AND (( [U].[linkName] like '%' + @Keyword + '%'  OR [U].[componentName] like '%' + @Keyword + '%' OR [U].[functionalConfig] like '%' + @Keyword + '%' OR [U].[keys] like '%' + @Keyword + '%' OR [U].[value] like '%' + @Keyword + '%') OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'linkName' AND @sortdirection = 'ASC' THEN [U].[linkName] END ASC,
+		CASE WHEN @orderby = 'linkName' AND @sortdirection = 'DESC' THEN [U].[linkName] END DESC,
+        
+		CASE WHEN @orderby = 'componentName' AND @sortdirection = 'ASC' THEN [U].[componentName] END ASC,
+		CASE WHEN @orderby = 'componentName' AND @sortdirection = 'DESC' THEN [U].[componentName] END DESC,
+
+		CASE WHEN @orderby = 'functionalConfig' AND @sortdirection = 'ASC' THEN [U].[functionalConfig] END ASC,
+		CASE WHEN @orderby = 'functionalConfig' AND @sortdirection = 'DESC' THEN [U].[functionalConfig] END DESC,
+        
+		CASE WHEN @orderby = 'keys' AND @sortdirection = 'ASC' THEN [U].[keys] END ASC,
+		CASE WHEN @orderby = 'keys' AND @sortdirection = 'DESC' THEN [U].[keys] END DESC,
+
+		CASE WHEN @orderby = 'value' AND @sortdirection = 'ASC' THEN [U].[value] END ASC,
+		CASE WHEN @orderby = 'value' AND @sortdirection = 'DESC' THEN [U].[value] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [DeptMailId]
+	FROM #DisplayOrderTmp
+	GROUP BY [DeptMailId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[Id],
+	[COM].[linkName],
+	[COM].[componentName],
+	[COM].[functionalConfig],
+	[COM].[keys],
+	[COM].[value]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[staticConfiguration] [COM] with (NOLOCK) ON [COM].[id] = [pi].[CustId]  
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spDepartmentEmailWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spDepartmentEmailWorkflow] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'id', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[DeptMailId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([DeptMailId]) 
+	SELECT U.[requestId] AS [DeptMailId] FROM [dbo].[staticContentWorkflow] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[status] = 'inprogress' AND (( [U].[pageName] like '%' + @Keyword + '%'  OR [U].[componentName] like '%' + @Keyword + '%' OR [U].[functionalConfig] like '%' + @Keyword + '%' OR [U].[keys] like '%' + @Keyword + '%' OR [U].[value] like '%' + @Keyword + '%') OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'pageName' AND @sortdirection = 'ASC' THEN [U].[pageName] END ASC,
+		CASE WHEN @orderby = 'pageName' AND @sortdirection = 'DESC' THEN [U].[pageName] END DESC,
+        
+		CASE WHEN @orderby = 'componentName' AND @sortdirection = 'ASC' THEN [U].[componentName] END ASC,
+		CASE WHEN @orderby = 'componentName' AND @sortdirection = 'DESC' THEN [U].[componentName] END DESC,
+
+		CASE WHEN @orderby = 'functionalConfig' AND @sortdirection = 'ASC' THEN [U].[functionalConfig] END ASC,
+		CASE WHEN @orderby = 'functionalConfig' AND @sortdirection = 'DESC' THEN [U].[functionalConfig] END DESC,
+        
+		CASE WHEN @orderby = 'keys' AND @sortdirection = 'ASC' THEN [U].[keys] END ASC,
+		CASE WHEN @orderby = 'keys' AND @sortdirection = 'DESC' THEN [U].[keys] END DESC,
+
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[requestId] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[requestId] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [DeptMailId]
+	FROM #DisplayOrderTmp
+	GROUP BY [DeptMailId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[requestId],
+	[COM].[pageName],
+	[COM].[componentName],
+	[COM].[functionalConfig],
+	[COM].[keys],
+	[COM].[value],
+	[COM].[Author],
+	[COM].[requestedDate]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[staticContentWorkflow] [COM] with (NOLOCK) ON [COM].[requestId] = [pi].[CustId]  
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spFinanceReport]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spFinanceReport] 
+@fromDate nvarchar(200) = '16/09/2021',
+@toDate nvarchar(200) = '17/09/2021',
+@keyword NVARCHAR(MAX) = NUll, 
+@orderby NVARCHAR(200) = 'transcationDate', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	INT = 0,
+@pagesize INT = 1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([CustId]) 
+		--SELECT U.[Id] AS [CustId] FROM [dbo].[RefundReports] [U] 
+	--WHERE CONVERT(datetime,[U].[creditNoteDate],103)>= CONVERT(datetime,'22/07/2021',103) AND CONVERT(DATETIME,[U].[creditNoteDate],103)<= CONVERT(datetime,'26/07/2021',103)
+	--AND ([U].[customerName] like '%praveen%')
+	SELECT U.[Id] AS [CustId] FROM [dbo].[financeReport] [U] 
+	WHERE CONVERT(datetime,[U].[transactionDate],103)>= CONVERT(datetime,@Fromdate,103) AND CONVERT(DATETIME,[U].[transactionDate],103)<= CONVERT(datetime,@Todate,103)
+	AND ([U].[nameofContact] like '%' + @Keyword + '%')
+		ORDER BY 
+		CASE WHEN @orderby = 'nameOfContact' AND @sortdirection = 'ASC' THEN [U].[nameofContact] END ASC,
+		CASE WHEN @orderby = 'nameOfContact' AND @sortdirection = 'DESC' THEN [U].[nameofContact] END DESC,
+        CASE WHEN @orderby = 'city' AND @sortdirection = 'ASC' THEN [U].[city] END ASC,
+		CASE WHEN @orderby = 'city' AND @sortdirection = 'DESC' THEN [U].[city] END DESC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[ID] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[ID] END DESC,
+		CASE WHEN @orderby = 'transcationDate' AND @sortdirection = 'ASC' THEN [U].[ID] END ASC,
+		CASE WHEN @orderby = 'transcationDate' AND @sortdirection = 'DESC' THEN [U].[ID] END DESC,
+		CASE WHEN @orderby = 'vatTrnNumber,' AND @sortdirection = 'ASC' THEN [U].[vatTrnNumber] END ASC,
+		CASE WHEN @orderby = 'vatTrnNumber' AND @sortdirection = 'DESC' THEN [U].[vatTrnNumber] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [CustId]
+	FROM #DisplayOrderTmp
+	GROUP BY [CustId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[id],
+	Convert(date,[COM].[transactionDate],103) as transactionDate,
+	[COM].[AccountType],
+	[COM].[accountCode],
+	[COM].[text],
+	[COM].[debit],
+	[COM].[credit],
+	[COM].[offsetAccountType],
+    [COM].[offsetAccountCode],
+	[COM].[businessStream],
+	[COM].[department],
+	[COM].[Employee],
+	[COM].[jobNumber],
+	[COM].[properties],
+	[COM].[relatedParty],
+	[COM].[invoiceNo],
+	[COM].[depositslip],
+	[COM].[paymentReference],
+	[COM].[companyCode],
+	[COM].[offsetcompanyCode],
+	[COM].[invoicestartDate],
+	[COM].[invoiceEndDate],
+	[COM].[approver],
+	[COM].[vatPostingGroup],
+	[COM].[vatItemPostingGroup],
+	[COM].[contatctNo_TradeLicenseNoIFM],
+	[COM].[nameofContact],
+	[COM].[vatTRNnumber],
+	[COM].[address],
+	[COM].[jobNumber],
+	[COM].[city],
+	[COM].[phoneNumber]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[financeReport] [COM] with (NOLOCK) ON [COM].[id] = [pi].[CustId]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spGetPromoCode]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spGetPromoCode]
+@promoCode NVARCHAR(200) = NULL, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'serviceName', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@pagenumber	int = 0,
+@pagesize int = 25,
+@TotalRecords int=NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] int IDENTITY (1, 1) NOT NULL,
+		[promoId] int NOT NULL
+	)
+	
+	SET @Sql = 'INSERT INTO #DisplayOrderTmp ([promoId]) SELECT U.[promo_id] AS [promoId]
+	FROM [dbo].[promoCode] [U] INNER JOIN [dbo].[service] [a] on [U].[service_id] = [a].[service_id] WHERE [U].[active] = 1 AND  1=1';
+
+	if(@promoCode IS NOT NULL AND @promoCode != '')
+	SET @Sql = @Sql + ' AND ([U].promoCode=' + CONVERT(NVARCHAR,@promoCode) + ') ';
+
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	
+	SET @Keyword = '%' + @Keyword + '%'
+
+	SET @sql = @sql + ' AND [U].[promoCode] like ' + '''' + @Keyword + '''' + ' OR [a].[serviceName] like ' + '''' + @Keyword + '''' ;
+	END
+
+	IF(@orderby IS NOT NULL AND @orderby != '')
+	SET @Sql = @Sql + ' ORDER BY ' + (CASE WHEN @orderby='promoCode' THEN '[U].[promoCode]'WHEN @orderby='serviceName' THEN '[a].[serviceName]' ELSE @orderby END) + ' ' + @sortdirection
+
+	-- EXEC spLongPrint @Sql
+	EXEC sp_executesql @Sql
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[promoId] int NOT NULL
+	)
+	INSERT INTO #PageIndex ([promoId])
+	SELECT [promoId]
+	FROM #DisplayOrderTmp
+	GROUP BY [promoId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) [pi].[promoId] AS [Id],
+	[COM].[service_id],
+	[b].[serviceName],
+	[COM].[promoCode],
+	[COM].[discountPercent],
+	[COM].[discountAmount],
+	[COM].[expiryDate],
+	[COM].[isDiscountPercent]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[promoCode] [COM] with (NOLOCK) ON [COM].[promo_id] = [pi].[promoId] INNER JOIN [dbo].[service] [b] with (NOLOCK) ON [b].[service_id] = [COM].[service_id]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spGetPromoCodeWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ CREATE PROCEDURE [dbo].[spGetPromoCodeWorkflow]
+
+ 
+@promoCode NVARCHAR(200) = NULL, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'serviceName', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	int = 0,
+@pagesize int = 25,
+@TotalRecords int=NULL OUTPUT 
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[requestId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([requestId]) 
+	SELECT U.[request_id] AS [HolidayId] FROM [dbo].[promoCodeWorkflow] [U] inner join [dbo].[service] [a] on [U].[service_id] = [a].[service_id]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE( [U].[status] = @status or  @status is NULL ) AND ([U].[user_id] =@userId or @userId is NULL ) AND (( [U].[promoCode] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'promoCode' AND @sortdirection = 'ASC' THEN [U].[promoCode] END ASC,
+		CASE WHEN @orderby = 'promoCode' AND @sortdirection = 'DESC' THEN [U].[promoCode] END DESC,
+		CASE WHEN @orderby = 'serviceName' AND @sortdirection = 'ASC' THEN [a].[serviceName] END ASC,
+		CASE WHEN @orderby = 'serviceName' AND @sortdirection = 'DESC' THEN [a].[serviceName] END DESC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[request_id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[request_id] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[requestId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([requestId])
+	SELECT [requestId]
+	FROM #DisplayOrderTmp
+	GROUP BY [requestId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+SELECT TOP (@RowsToReturn) [pi].[requestId] AS [Id],
+	[COM].[service_id],
+	[COM].[requestedDate],
+	[b].[serviceName],
+	[COM].[author],
+	[COM].[promoCode],
+	[COM].[status],
+	[COM].[discountPercent],
+	[COM].[discountAmount],
+	[COM].[expiryDate],
+	[COM].[action],
+	[COM].[comments],
+	[COM].[publisher],
+	[COM].[statusActionDate]
+
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[promoCodeWorkflow] [COM] with (NOLOCK) ON [COM].[request_id] = [pi].[requestId] INNER JOIN [dbo].[service] [b] with (NOLOCK) ON [b].[service_id] = [COM].[service_id]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spHoliday]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spHoliday] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[HolidayId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([HolidayId]) 
+	SELECT U.[Holiday_id] AS [HolidayId] FROM [dbo].[listOfHolidays] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[flag] = '1' AND (( [U].[HolidayDate] like '%' + @Keyword + '%'  ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'HolidayDate' AND @sortdirection = 'ASC' THEN [U].[HolidayDate] END ASC,
+		CASE WHEN @orderby = 'HolidayDate' AND @sortdirection = 'DESC' THEN [U].[HolidayDate] END DESC
+        
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [HolidayId]
+	FROM #DisplayOrderTmp
+	GROUP BY [HolidayId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[Holiday_id],
+	[COM].[HolidayDate]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[listOfHolidays] [COM] with (NOLOCK) ON [COM].[Holiday_id] = [pi].[CustId]  
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spHolidayWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spHolidayWorkflow] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'id', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[HolidayId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([HolidayId]) 
+	SELECT U.[request_id] AS [HolidayId] FROM [dbo].[listOfHolidaysWorkflow] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ( [U].[status] = @status or  @status is NULL )AND ([U].[user_id] =@userId or @userId is NULL ) AND (( [U].[HolidayDate] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'HolidayDate' AND @sortdirection = 'ASC' THEN [U].[HolidayDate] END ASC,
+		CASE WHEN @orderby = 'HolidayDate' AND @sortdirection = 'DESC' THEN [U].[HolidayDate] END DESC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[request_id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[request_id] END DESC
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [HolidayId]
+	FROM #DisplayOrderTmp
+	GROUP BY [HolidayId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[request_id],
+	[COM].[HolidayDate],
+	[COM].[Author],
+	[COM].[requestedDate],
+	[COM].[status],
+	[COM].[action],
+	[COM].[publisher],
+    [COM]. [statusActionDate],
+    [COM].  [comments]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[listOfHolidaysWorkflow] [COM] with (NOLOCK) ON [COM].[request_id] = [pi].[CustId]  
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spJobReport]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spJobReport]
+@fromDate NVARCHAR(200) = '19/09/2021',
+@toDate NVARCHAR(200) = '20/09/2021',
+@filter  NVARCHAR(200) = NULL,
+@filter1  NVARCHAR(200) = NULL,
+@filter2  NVARCHAR(200) = NULL,
+
+
+
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(MAX) = NULL, 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	int = 0,
+@pagesize int = 10000,
+@TotalRecords int= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id1] int IDENTITY (1, 1) NOT NULL,
+		[jobId] int  NOT NULL
+	)
+	
+	SET @Sql = 'INSERT INTO #DisplayOrderTmp ([Id]) SELECT  U.[Id] AS [Id] 
+	FROM [dbo].[JobReports] [U] WHERE 1=1' ;
+	INSERT INTO #DisplayOrderTmp ([jobId]) 
+	SELECT U.[Id] AS [jobId] FROM [dbo].[viewJobReports] [U] 
+	--WHERE (([U].[DateCreated] >= [dbo].[fnFormatDate] (@fromDate, 'YYYY-MM-DD') OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[DateCreated] <= [dbo].[fnFormatDate] (@Todate, 'YYYY-MM-DD') OR (@toDate IS NULL OR @toDate = '')))
+     WHERE CONVERT(date,[U].[DateCreated],103) >= CONVERT(datetime,@Fromdate,103) AND CONVERT(date,[U].[DateCreated],103)<= CONVERT(datetime,@Todate,103)  AND ([U].[location] = @filter or @filter is NULL or [U].[Category] = @filter ) AND ([U].[LevelofCompletion] = @filter1 or @filter1 is NULL or [U].[LevelofCompletion] = @filter2 or @filter2=NULL )  
+	AND (([U].[Category] like '%' + @Keyword + '%' OR [U].[Companyname] like '%' + @Keyword + '%'  OR [U].[Firstname] + ' ' +[U].[Lastname] like '%' + @Keyword + '%' or [U].[Location] like '%' + @Keyword + '%' OR [U].[LevelofCompletion] like '%' + @Keyword + '%') OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'ASC' THEN [U].[Firstname] + ' '+ [U].[Lastname] END ASC,
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'DESC' THEN [U].[Firstname] + ' ' +[U].[Lastname] END DESC,
+		CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'ASC' THEN [U].[DateCreated] END ASC,
+		CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'DESC' THEN [U].[DateCreated] END DESC,
+      
+		CASE WHEN @orderby = 'jobId' AND @sortdirection = 'ASC' THEN [U].[Jobid] END ASC,
+		CASE WHEN @orderby = 'jobId' AND @sortdirection = 'DESC' THEN [U].[Jobid] END DESC,
+		CASE WHEN @orderby = 'location' AND @sortdirection = 'ASC' THEN [U].[location] END ASC,
+		CASE WHEN @orderby = 'location' AND @sortdirection = 'DESC' THEN [U].[location] END DESC,
+		CASE WHEN @orderby = 'typeOfUnit' AND @sortdirection = 'ASC' THEN [U].[TypeofUnit] END ASC,
+		CASE WHEN @orderby = 'typeOfUnit' AND @sortdirection = 'DESC' THEN [U].[TypeofUnit] END DESC,
+		CASE WHEN @orderby = 'category' AND @sortdirection = 'ASC' THEN [U].[Category] END ASC,
+		CASE WHEN @orderby = 'category' AND @sortdirection = 'DESC' THEN [U].[Category] END DESC,
+		CASE WHEN @orderby = 'levelOfCompletion' AND @sortdirection = 'ASC' THEN [U].[LevelofCompletion] END ASC,
+		CASE WHEN @orderby = 'levelOfCompletion' AND @sortdirection = 'DESC' THEN [U].[LevelofCompletion] END DESC
+
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[Id] int NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([Id])
+	SELECT [jobId]
+	FROM #DisplayOrderTmp
+	GROUP BY [jobId],[Id1]
+	ORDER BY min([Id1])
+
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) 
+	[COM].[Jobid],
+	[COM].[Firstname],
+	[COM].[Lastname],
+	[COM].[TypeofUnit],
+	[COM].[Email],
+	[COM].[Mobilenumber],
+	[COM].[CompanyEmail],
+	[COM].[Companymobile],
+	[COM].[Companyname],
+	[COM].[Category],
+	[COM].[location],
+	[COM].[BuildingName],
+	[COM].[Apartment],
+	[COM].[FloorNumber],
+	[COM].[Faultdescription],
+	[COM].[DateCreated],
+	[COM].[LevelofCompletion],
+	[COM].[Status],
+	[COM].[DueBy],
+	[COM].[DateCompleted],
+	[COM].[Scheduletime],
+	[COM].[JobCharge],
+	[COM].[Paymentstatus]
+
+	FROM
+		#PageIndex [pi]
+		LEFT OUTER JOIN [dbo].[viewJobReports] [COM] with (NOLOCK) ON [COM].[Id] = [pi].[Id]
+		
+		WHERE
+		--[COM].DateCreated between CONVERT(datetime,@Fromdate,103) AND CONVERT(datetime,@Todate,103) AND
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	order by	
+	CASE WHEN @orderby = null AND @sortdirection = 'ASC' THEN [COM].[DateCreated] END ASC,
+	CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'ASC' THEN [COM].[DateCreated] END ASC,
+	CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'DESC' THEN [COM].[DateCreated] END DESC
+	
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spJobScheduleReport]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spJobScheduleReport]
+@fromDate NVARCHAR(200) = '01/07/2021',
+@toDate NVARCHAR(200) = '19/09/2021',
+@LevelofCompletion VARCHAR(200) = NULL,
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	int = 0,
+@pagesize int = 1000,
+@TotalRecords int= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id1] int IDENTITY (1, 1) NOT NULL,
+		[Id] NVARCHAR(200)  NULL
+	)
+
+	INSERT INTO #DisplayOrderTmp ([Id]) 
+	SELECT U.[Id] AS [Id] FROM [dbo].[viewJobScheduleReports] [U] 
+	--WHERE (([U].[DateCreated] >= [dbo].[fnFormatDate] (@fromDate, 'YYYY-MM-DD') OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[DateCreated] <= [dbo].[fnFormatDate] (@Todate, 'YYYY-MM-DD') OR (@toDate IS NULL OR @toDate = '')))
+    WHERE CONVERT(date,[U].[DateCreated],103) >= CONVERT(date,@Fromdate,103) AND CONVERT(date,[U].[DateCreated],103)<= CONVERT(date,@Todate,103)
+
+	AND (([U].[Category] like '%' + @Keyword + '%' OR [U].[Firstname] + ' '+ [U].[Lastname] like '%' + @Keyword + '%' OR [U].[Location] like '%' + @Keyword + '%' OR [U].[LevelofCompletion] like '%' + @Keyword + '%') OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'ASC' THEN [U].[DateCreated] END ASC,
+		CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'DESC' THEN [U].[DateCreated] END DESC,
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'ASC' THEN [U].[Firstname] + ' '+ [U].[Lastname] END ASC,
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'DESC' THEN [U].[Firstname] + ' ' +[U].[Lastname] END DESC,
+		CASE WHEN @orderby = 'levelOfCompletion' AND @sortdirection = 'ASC' THEN [U].[LevelofCompletion] END ASC,
+		CASE WHEN @orderby = 'levelOfCompletion' AND @sortdirection = 'DESC' THEN [U].[LevelofCompletion] END DESC,
+		CASE WHEN @orderby = 'jobId' AND @sortdirection = 'ASC' THEN [U].[Jobid] END ASC,
+		CASE WHEN @orderby = 'jobId' AND @sortdirection = 'DESC' THEN [U].[Jobid] END DESC,
+		CASE WHEN @orderby = 'location' AND @sortdirection = 'ASC' THEN [U].[location] END ASC,
+		CASE WHEN @orderby = 'location' AND @sortdirection = 'DESC' THEN [U].[location] END DESC,
+		CASE WHEN @orderby = 'typeOfUnit' AND @sortdirection = 'ASC' THEN [U].[TypeofUnit] END ASC,
+		CASE WHEN @orderby = 'typeOfUnit' AND @sortdirection = 'DESC' THEN [U].[TypeofUnit] END DESC,
+		CASE WHEN @orderby = 'category' AND @sortdirection = 'ASC' THEN [U].[Category] END ASC,
+		CASE WHEN @orderby = 'category' AND @sortdirection = 'DESC' THEN [U].[Category] END DESC
+        
+	
+	
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[Id] NVARCHAR(200)  NULL
+	)
+
+	INSERT INTO #PageIndex ([Id])
+	SELECT [Id]
+	FROM #DisplayOrderTmp
+	GROUP BY [Id],[Id1]
+	ORDER BY min([Id1])
+
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) 
+	[COM].[Jobid],
+	[COM].[Firstname],
+	[COM].[Lastname],
+	[COM].[TypeofUnit],
+	[COM].[Email],
+	[COM].[Mobilenumber],
+	[COM].[CompanyEmail],
+	[COM].[Companymobile],
+	[COM].[Companyname],
+	[COM].[Category],
+	[COM].[location],
+	[COM].[BuildingName],
+	[COM].[Apartment],
+	[COM].[FloorNumber],
+	[COM].[Faultdescription],
+	[COM].[DateCreated],
+	[COM].[LevelofCompletion],
+	
+	
+	[COM].[Scheduletime],
+	
+	[COM].[Paymentstatus]
+
+	FROM
+		#PageIndex [pi]
+		LEFT OUTER JOIN [dbo].[viewJobScheduleReports] [COM] with (NOLOCK) ON [COM].[Id] = [pi].[Id]
+		
+		WHERE
+		--[COM].DateCreated between CONVERT(datetime,@Fromdate,103) AND CONVERT(datetime,@Todate,103) AND
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+		
+	order by	
+	CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'ASC' THEN [COM].[DateCreated] END ASC,
+	CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'DESC' THEN [COM].[DateCreated] END DESC
+	
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+GO
+/****** Object:  StoredProcedure [dbo].[spMailer]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spMailer] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[MailId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([MailId]) 
+	SELECT U.[mailer_id] AS [MailId] FROM [dbo].[mailer] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[flag] = '1' AND (( [U].[mail_type] like '%' + @Keyword + '%'  OR [U].[mailSubject] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'mailType' AND @sortdirection = 'ASC' THEN [U].[mail_type] END ASC,
+		CASE WHEN @orderby = 'mailType' AND @sortdirection = 'DESC' THEN [U].[mail_type] END DESC,
+        
+		CASE WHEN @orderby = 'mailSubject' AND @sortdirection = 'ASC' THEN [U].[mailSubject] END ASC,
+		CASE WHEN @orderby = 'mailSubject' AND @sortdirection = 'DESC' THEN [U].[mailSubject] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [MailId]
+	FROM #DisplayOrderTmp
+	GROUP BY [MailId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[mailer_id],
+	[COM].[mail_type],
+	[COM].[mailBody],
+	[COM].[mailSubject]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[mailer] [COM] with (NOLOCK) ON [COM].[mailer_id] = [pi].[CustId]  
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[spMailerWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spMailerWorkflow] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'id', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[MailId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([MailId]) 
+	SELECT U.[request_id] AS [MailId] FROM [dbo].[mailerWorkflow] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ( [U].[status] = @status or  @status is NULL )AND ([U].[user_id] =@userId or @userId is NULL )  AND (( [U].[mail_type] like '%' + @Keyword + '%'  OR [U].[mailSubject] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'mailType' AND @sortdirection = 'ASC' THEN [U].[mail_type] END ASC,
+		CASE WHEN @orderby = 'mailType' AND @sortdirection = 'DESC' THEN [U].[mail_type] END DESC,
+        CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[request_id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[request_id] END DESC,
+		CASE WHEN @orderby = 'mailSubject' AND @sortdirection = 'ASC' THEN [U].[mailSubject] END ASC,
+		CASE WHEN @orderby = 'mailSubject' AND @sortdirection = 'DESC' THEN [U].[mailSubject] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [MailId]
+	FROM #DisplayOrderTmp
+	GROUP BY [MailId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[request_id],
+	[COM].[mail_type] AS [mailType],
+	[COM].[mailBody],
+	[COM].[mailSubject],
+	[COM].[Author],
+	[COM].[requestedDate],
+	[COM].[status],
+	[COM].[action],
+	[COM].[publisher],
+    [COM]. [statusActionDate],
+    [COM].  [comments]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[mailerWorkflow] [COM] with (NOLOCK) ON [COM].[request_id] = [pi].[CustId]  
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spPicture]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spPicture] 
+@Id int = NULL, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'FileName', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber int = 0,
+@pagesize int = 25,
+@TotalRecords int = NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] int IDENTITY (1, 1) NOT NULL,
+		[PictureId] int NOT NULL
+	)
+	
+	SET @Sql = 'INSERT INTO #DisplayOrderTmp ([PictureId]) SELECT U.[Id] AS [Id]
+	FROM [dbo].[Picture] [U] WHERE 1=1';
+	
+	IF(@Id IS NOT NULL AND @Id != '' AND @Id != 0)
+	SET @Sql = @Sql + ' AND ([U].[Id]=' + CONVERT(NVARCHAR, @Id) + ')';
+
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	
+	SET @Keyword = '%' + @Keyword + '%'
+
+	
+	END
+
+	IF(@orderby IS NOT NULL AND @orderby != '')
+	SET @Sql = @Sql + ' ORDER BY ' + (CASE WHEN @orderby='FileName' THEN '[U].[FileName]' ELSE @orderby END) + ' ' + @sortdirection
+
+	-- EXEC spLongPrint @Sql
+	EXEC sp_executesql @Sql
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[Id] int NOT NULL
+	)
+	INSERT INTO #PageIndex ([Id])
+	SELECT [PictureId]
+	FROM #DisplayOrderTmp
+	GROUP BY [PictureId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) [pi].[Id] AS [Id],
+	[COM].[FileName],
+	[COM].[FileType],
+	[COM].[Src],
+	[COM].[ClearUrl],
+	[COM].[EncryptedUrl],
+	[COM].[Size],
+	[COM].[DisplayOrder],
+	[COM].[IsActive],
+	[COM].[Title],
+	[COM].[Type],
+	[COM].[IconSrc],
+	[COM].[CreatedOn],
+	[COM].[UserId]
+	
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[Picture] [COM] with (NOLOCK) ON [COM].[Id] = [pi].[Id] 
+		
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spPillarworkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spPillarworkflow] 
+
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'id', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[sid] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([sid] )
+	SELECT [U].[id] AS [sid] FROM [dbo].[PillarServicesWorkflow] [U]
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ( [U].[status] = @status or  @status is NULL )AND ([U].[user_id] =@userId or @userId is NULL )  AND (( [U]. [title] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'title' AND @sortdirection = 'ASC' THEN [U]. [title] END ASC,
+		CASE WHEN @orderby = 'title' AND @sortdirection = 'DESC' THEN [U]. [title] END DESC,
+        CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U]. [Id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U]. [Id] END DESC
+        
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[sid] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([sid])
+	SELECT [sid]
+	FROM #DisplayOrderTmp
+	GROUP BY [sid],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+      [COM].[Id],
+       [COM].[title],
+      [COM].[hoverLink],
+     [COM]. [pictureId],
+     [COM]. [requestedDate],
+     [COM]. [status],
+    [COM].  [statusActionDate],
+    [COM].  [author],
+      [COM].[publisher],
+     [COM]. [comments],
+    [COM].  [modifiedDate],
+     [COM]. [active],
+   [COM].   [requestId],
+    [COM].  [record],
+	[COM].[identification],
+	[COM].[cartbodycontent],
+	[COM].[cartbodycontent1]
+
+
+	
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[PillarServicesWorkflow] [COM] with (NOLOCK) ON [COM].[id] = [pi].[sid] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spPriceOffering]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spPriceOffering] 
+@serviceId  int = 1,
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[priceId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([priceId]) 
+	SELECT U.[pricing_id] AS [priceId] FROM [dbo].[priceOffering] [U] INNER JOIN [dbo].[service] [a] on [U].[service_id] = [a].[service_id] INNER JOIN [dbo].[propertyType] [b] on [U].[propertyType_id] = [b].[property_id] INNER JOIN [dbo].[propertySize] [c] on [U].[propertySize_id] = [c].[propertySize_id] INNER JOIN [dbo].[measurementLables] [d] on [U].[measurementTypeName_id] = [d].[measurementTypeName_id]   
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[service_id] = @serviceId AND [U].[active] = '1' AND  (( [b].[propertyTypeName] like '%' + @Keyword + '%'OR [c].[propertySize] like '%' + @Keyword + '%'OR [d].[measurementTypeName] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'propertyTypeName' AND @sortdirection = 'ASC' THEN [b].[propertyTypeName] END ASC,
+		CASE WHEN @orderby = 'propertyTypeName' AND @sortdirection = 'DESC' THEN [b].[propertyTypeName] END DESC,
+        CASE WHEN @orderby = 'propertySize' AND @sortdirection = 'ASC' THEN [c].[propertySize] END ASC,
+		CASE WHEN @orderby = 'propertySize' AND @sortdirection = 'DESC' THEN [c].[propertySize] END DESC,
+		CASE WHEN @orderby = 'measurementTypeName' AND @sortdirection = 'ASC' THEN [d].[measurementTypeName] END ASC,
+		CASE WHEN @orderby = 'measurementTypeName' AND @sortdirection = 'DESC' THEN [d].[measurementTypeName] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[priceId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([priceId])
+	SELECT [priceId]
+	FROM #DisplayOrderTmp
+	GROUP BY [priceId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[pricing_id],
+	[COM].[service_id],
+	[COM].[propertyType_id],
+	[b].[propertyTypeName],
+	[COM].[propertySize_id],
+	[c].[propertySize],
+	[COM].[measurementTypeName_id],
+	[d].[measurementTypeName],
+	[COM].[measurementType],
+	[COM].[price]
+	
+
+	
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[priceOffering] [COM] with (NOLOCK) ON [COM].[pricing_id] = [pi].[priceId] INNER JOIN [dbo].[service] [a] on [COM].[service_id] = [a].[service_id] INNER JOIN [dbo].[propertyType] [b] on [COM].[propertyType_id] = [b].[property_id] INNER JOIN [dbo].[propertySize] [c] on [COM].[propertySize_id] = [c].[propertySize_id] INNER JOIN [dbo].[measurementLables] [d] on [COM].[measurementTypeName_id] = [d].[measurementTypeName_id]    
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spQuotationReport]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spQuotationReport]
+@fromDate NVARCHAR(200) = '11/07/2021',
+@toDate NVARCHAR(200) = '15/07/2021',
+@filter NVARCHAR(200) = 'Quotation Awaiting Approval',
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'dateCreated', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@pagenumber	int = 0,
+@pagesize int = 1000,
+@TotalRecords int= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id1] int IDENTITY (1, 1) NOT NULL,
+		[Id] NVARCHAR(200)  NULL
+	)
+
+	INSERT INTO #DisplayOrderTmp ([Id]) 
+	SELECT U.[Id] AS [Id] FROM [dbo].[viewQuotationReports] [U] 
+	--WHERE (([U].[DateCreated] >= [dbo].[fnFormatDate] (@fromDate, 'YYYY-MM-DD') OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[DateCreated] <= [dbo].[fnFormatDate] (@Todate, 'YYYY-MM-DD') OR (@toDate IS NULL OR @toDate = '')))
+	WHERE  CONVERT(date,[U].[DateCreated],103) >= CONVERT(date,@Fromdate,103) AND  CONVERT(date,[U].[DateCreated],103)<= CONVERT(date,@Todate,103)AND ([U].[LevelofCompletion] = @filter  or @filter is NULL)
+	AND (([U].[Category] like '%' + @Keyword + '%'OR [U].[Companyname] like '%' + @Keyword + '%'  OR [U].[Firstname] + ' ' +[U].[Lastname] like '%' + @Keyword + '%'   OR [U].[Location] like '%' + @Keyword + '%' OR [U].[LevelofCompletion] like '%' + @Keyword + '%') OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+			CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'ASC' THEN [U].[DateCreated] END ASC,
+		CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'DESC' THEN [U].[DateCreated] END DESC,
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'ASC' THEN [U].[Firstname] END ASC,
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'DESC' THEN [U].[Firstname] END DESC,
+        CASE WHEN @orderby = 'lastName' AND @sortdirection = 'ASC' THEN [U].[Lastname] END ASC,
+		CASE WHEN @orderby = 'lastName' AND @sortdirection = 'DESC' THEN [U].[Lastname] END DESC,
+		 CASE WHEN @orderby = 'levelOfCompletion' AND @sortdirection = 'ASC' THEN [U].[LevelofCompletion] END ASC,
+		CASE WHEN @orderby = 'levelOfCompletion' AND @sortdirection = 'DESC' THEN [U].[LevelofCompletion] END DESC,
+		CASE WHEN @orderby = 'jobId' AND @sortdirection = 'ASC' THEN [U].[Jobid] END ASC,
+		CASE WHEN @orderby = 'jobId' AND @sortdirection = 'DESC' THEN [U].[Jobid] END DESC,
+		CASE WHEN @orderby = 'location' AND @sortdirection = 'ASC' THEN [U].[location] END ASC,
+		CASE WHEN @orderby = 'location' AND @sortdirection = 'DESC' THEN [U].[location] END DESC,
+		CASE WHEN @orderby = 'typeOfUnit' AND @sortdirection = 'ASC' THEN [U].[TypeofUnit] END ASC,
+		CASE WHEN @orderby = 'typeOfUnit' AND @sortdirection = 'DESC' THEN [U].[TypeofUnit] END DESC,
+		CASE WHEN @orderby = 'category' AND @sortdirection = 'ASC' THEN [U].[Category] END ASC,
+		CASE WHEN @orderby = 'category' AND @sortdirection = 'DESC' THEN [U].[Category] END DESC
+
+	
+		
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[Id] int NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([Id])
+	SELECT [Id]
+	FROM #DisplayOrderTmp
+	GROUP BY [Id],[Id1]
+	ORDER BY min([Id1])
+
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) 
+	[COM].[Jobid],
+	[COM].[Firstname],
+	[COM].[Lastname],
+	[COM].[TypeofUnit],
+	[COM].[Email],
+	[COM].[Mobilenumber],
+	[COM].[CompanyEmail],
+	[COM].[Companymobile],
+	[COM].[Companyname],
+	[COM].[Category],
+	[COM].[location],
+	[COM].[BuildingName],
+	[COM].[Apartment],
+	[COM].[FloorNumber],
+	[COM].[Faultdescription],
+	[COM].[DateCreated],
+	[COM].[LevelofCompletion],
+	[COM].[ApprovalStatus],
+	
+	[COM].[Charge],
+	[COM].[DateCompleted],
+	
+	[COM].[Paymentstatus],
+	[COM].[Invoicenumber]
+
+	FROM
+		#PageIndex [pi]
+		LEFT OUTER JOIN [dbo].[viewQuotationReports] [COM] with (NOLOCK) ON [COM].[Id] = [pi].[Id]
+		
+		WHERE
+		--[COM].DateCreated between CONVERT(datetime,@Fromdate,103) AND CONVERT(datetime,@Todate,103) AND
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+		
+   order by	
+	CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'ASC' THEN [COM].[DateCreated] END ASC,
+	CASE WHEN @orderby = 'dateCreated' AND @sortdirection = 'DESC' THEN [COM].[DateCreated] END DESC
+	
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+
+GO
+/****** Object:  StoredProcedure [dbo].[spRefundReport]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spRefundReport] 
+@fromDate nvarchar(200) = '22/07/2021',
+@toDate nvarchar(200) = '23/07/2021',
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'date', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	INT = 0,
+@pagesize INT = 25,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([CustId]) 
+		--SELECT U.[Id] AS [CustId] FROM [dbo].[RefundReports] [U] 
+	--WHERE CONVERT(datetime,[U].[creditNoteDate],103)>= CONVERT(datetime,'22/07/2021',103) AND CONVERT(DATETIME,[U].[creditNoteDate],103)<= CONVERT(datetime,'26/07/2021',103)
+	--AND ([U].[customerName] like '%praveen%')
+	SELECT U.[Id] AS [CustId] FROM [dbo].[RefundReports] [U] 
+	WHERE CONVERT(datetime,[U].[creditNoteDate],103)>= CONVERT(datetime,@Fromdate,103) AND CONVERT(DATETIME,[U].[creditNoteDate],103)<= CONVERT(datetime,@Todate,103)
+	AND ([U].[customerName] like '%' + @Keyword + '%')
+		ORDER BY 
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'ASC' THEN [U].[customerName] END ASC,
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'DESC' THEN [U].[customerName] END DESC,
+		CASE WHEN @orderby = 'description' AND @sortdirection = 'ASC' THEN [U].[description] END ASC,
+		CASE WHEN @orderby = 'description' AND @sortdirection = 'DESC' THEN [U].[description] END DESC,
+		CASE WHEN @orderby = 'netAmount' AND @sortdirection = 'ASC' THEN [U].[netAmount] END ASC,
+		CASE WHEN @orderby = 'netAmount' AND @sortdirection = 'DESC' THEN [U].[netAmount] END DESC,
+		CASE WHEN @orderby = 'vat' AND @sortdirection = 'ASC' THEN [U].[vat] END ASC,
+		CASE WHEN @orderby = 'vat' AND @sortdirection = 'DESC' THEN [U].[vat] END DESC,
+		CASE WHEN @orderby = 'totalAmountPaid' AND @sortdirection = 'ASC' THEN [U].[totalAmountPaid] END ASC,
+		CASE WHEN @orderby = 'totalAmountPaid' AND @sortdirection = 'DESC' THEN [U].[totalAmountPaid] END DESC,
+		CASE WHEN @orderby = 'jobNo' AND @sortdirection = 'ASC' THEN [U].[jobNo] END ASC,
+		CASE WHEN @orderby = 'jobNo' AND @sortdirection = 'DESC' THEN [U].[jobNo] END DESC,
+		CASE WHEN @orderby = 'date' AND @sortdirection = 'ASC' THEN [U].[creditNoteDate] END ASC,
+		CASE WHEN @orderby = 'date' AND @sortdirection = 'DESC' THEN [U].[creditNoteDate] END DESC,
+		CASE WHEN @orderby = 'legalEntity' AND @sortdirection = 'ASC' THEN [U].[legalEntity] END ASC,
+		CASE WHEN @orderby = 'legalEntity' AND @sortdirection = 'DESC' THEN [U].[legalEntity] END DESC,
+		CASE WHEN @orderby = 'address' AND @sortdirection = 'ASC' THEN [U].[address] END ASC,
+		CASE WHEN @orderby = 'address' AND @sortdirection = 'DESC' THEN [U].[address] END DESC,
+		CASE WHEN @orderby = 'paymentReferenceNo' AND @sortdirection = 'ASC' THEN [U].[paymentReferenceNo] END ASC,
+		CASE WHEN @orderby = 'paymentReferenceNo' AND @sortdirection = 'DESC' THEN [U].[paymentReferenceNo] END DESC,
+        CASE WHEN @orderby = 'city' AND @sortdirection = 'ASC' THEN [U].[city] END ASC,
+		CASE WHEN @orderby = 'city' AND @sortdirection = 'DESC' THEN [U].[city] END DESC,
+		CASE WHEN @orderby = 'vatTrnNumber,' AND @sortdirection = 'ASC' THEN [U].[vatTrnNumber] END ASC,
+		CASE WHEN @orderby = 'vatTrnNumber' AND @sortdirection = 'DESC' THEN [U].[vatTrnNumber] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [CustId]
+	FROM #DisplayOrderTmp
+	GROUP BY [CustId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[Id],
+	[COM].[creditNoteDate],
+	[COM].[description],
+	[COM].[netAmount],
+	[COM].[vat],
+	[COM].[totalAmountPaid],
+	[COM].[jobNo],
+	[COM].[creditNoteNumber],
+    [COM].[paymentReferenceNo],
+	[COM].[legalEntity],
+	[COM].[customerName],
+	[COM].[vatTrnNumber],
+	[COM].[address],
+	[COM].[city]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[RefundReports] [COM] with (NOLOCK) ON [COM].[id] = [pi].[CustId]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spSalesReport]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spSalesReport] 
+@fromDate nvarchar(200) = '01/07/2021',
+@toDate nvarchar(200) = '17/09/2021',
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'invoiceDate', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	INT = 0,
+@pagesize INT = 1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([CustId]) 
+	--SELECT U.[Id] AS [CustId] FROM [dbo].[salesReport] [U] 
+	--WHERE CONVERT(datetime,[U].[invoiceDate],103)>= CONVERT(datetime,'04/06/2021',103) AND CONVERT(DATETIME,[U].[invoiceDate],103)<= CONVERT(datetime,'05/08/2021',103)
+	--AND ([U].[customerName] like '%jaya%')
+	SELECT U.[Id] AS [CustId] FROM [dbo].[salesReport] [U] 
+	WHERE CONVERT(datetime,[U].[invoiceDate],103)>= CONVERT(datetime,@Fromdate,103) AND CONVERT(DATETIME,[U].[invoiceDate],103)<= CONVERT(datetime,@Todate,103)
+	AND ([U].[customerName] like '%' + @Keyword + '%')
+		ORDER BY 
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'ASC' THEN [U].[customerName] END ASC,
+		CASE WHEN @orderby = 'customerName' AND @sortdirection = 'DESC' THEN [U].[customerName] END DESC,
+		CASE WHEN @orderby = 'description' AND @sortdirection = 'ASC' THEN [U].[description] END ASC,
+		CASE WHEN @orderby = 'description' AND @sortdirection = 'DESC' THEN [U].[description] END DESC,
+		CASE WHEN @orderby = 'netAmount' AND @sortdirection = 'ASC' THEN [U].[netAmount] END ASC,
+		CASE WHEN @orderby = 'netAmount' AND @sortdirection = 'DESC' THEN [U].[netAmount] END DESC,
+		CASE WHEN @orderby = 'vat' AND @sortdirection = 'ASC' THEN [U].[vat] END ASC,
+		CASE WHEN @orderby = 'vat' AND @sortdirection = 'DESC' THEN [U].[vat] END DESC,
+		CASE WHEN @orderby = 'totalAmount' AND @sortdirection = 'ASC' THEN [U].[totalAmount] END ASC,
+		CASE WHEN @orderby = 'totalAmount' AND @sortdirection = 'DESC' THEN [U].[totalAmount] END DESC,
+		CASE WHEN @orderby = 'jobNo' AND @sortdirection = 'ASC' THEN [U].[jobNo] END ASC,
+		CASE WHEN @orderby = 'jobNo' AND @sortdirection = 'DESC' THEN [U].[jobNo] END DESC,
+		CASE WHEN @orderby = 'invoiceNo' AND @sortdirection = 'ASC' THEN [U].[invoiceNo] END ASC,
+		CASE WHEN @orderby = 'invoiceNo' AND @sortdirection = 'DESC' THEN [U].[invoiceNo] END DESC,
+		CASE WHEN @orderby = 'legalEntity' AND @sortdirection = 'ASC' THEN [U].[legalEntity] END ASC,
+		CASE WHEN @orderby = 'legalEntity' AND @sortdirection = 'DESC' THEN [U].[legalEntity] END DESC,
+		CASE WHEN @orderby = 'address' AND @sortdirection = 'ASC' THEN [U].[address] END ASC,
+		CASE WHEN @orderby = 'address' AND @sortdirection = 'DESC' THEN [U].[address] END DESC,
+		CASE WHEN @orderby = 'city' AND @sortdirection = 'ASC' THEN [U].[city] END ASC,
+		CASE WHEN @orderby = 'city' AND @sortdirection = 'DESC' THEN [U].[city] END DESC,
+		CASE WHEN @orderby = 'invoiceDate' AND @sortdirection = 'ASC' THEN Convert(date,[U].[invoiceDate],103)  END ASC,
+		CASE WHEN @orderby = 'invoiceDate' AND @sortdirection = 'DESC' THEN Convert(date,[U].[invoiceDate],103)  END DESC,
+		CASE WHEN @orderby = 'vatTrnNumber,' AND @sortdirection = 'ASC' THEN [U].[vatTrnNumber] END ASC,
+		CASE WHEN @orderby = 'vatTrnNumber' AND @sortdirection = 'DESC' THEN [U].[vatTrnNumber] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [CustId]
+	FROM #DisplayOrderTmp
+	GROUP BY [CustId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[Id],
+	Convert(date,[COM].[invoiceDate],103) As invoiceDate,
+	[COM].[description],
+	[COM].[netAmount],
+	[COM].[vat],
+	[COM].[totalAmount],
+	[COM].[jobNo],
+	[COM].[invoiceNo],
+    [COM].[paymentRefNo],
+	[COM].[legalEntity],
+	[COM].[customerName],
+	[COM].[vatTrnNumber],
+	[COM].[address],
+	[COM].[city]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[salesReport] [COM] with (NOLOCK) ON [COM].[id] = [pi].[CustId]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spSearchDepartment]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spSearchDepartment]
+@departmentId int = NULL, 
+@departmentName NVARCHAR(200) = NULL, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'department_id', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	int = 0,
+@pagesize int = 25,
+@TotalRecords int=NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] int IDENTITY (1, 1) NOT NULL,
+		[DepartmentId] int NOT NULL
+	)
+	
+	SET @Sql = 'INSERT INTO #DisplayOrderTmp ([DepartmentId]) SELECT U.[department_id] AS [DepartmentId]
+	FROM [dbo].[department] [U] WHERE [U].[departmentName] != ''Default'' AND [U].[active] = 1 AND 1=1';
+	
+	IF(@departmentId IS NOT NULL AND @departmentId != '' AND @departmentId != 0)
+	SET @Sql = @Sql + ' AND ([U].[department_id]=' + CONVERT(NVARCHAR, @departmentId) + ')';
+	
+	if(@departmentName IS NOT NULL AND @departmentName != '')
+	SET @Sql = @Sql + ' AND ([U].departmentName=' + CONVERT(NVARCHAR,@departmentName) + ') ';
+
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	
+	SET @Keyword = '%' + @Keyword + '%'
+
+	SET @sql = @sql + ' AND [U].[departmentName] like ' + '''' + @Keyword + '''' ;
+	END
+
+	IF(@orderby IS NOT NULL AND @orderby != '')
+	SET @Sql = @Sql + ' ORDER BY ' + (CASE WHEN @orderby='departmentName' THEN '[U].[departmentName]' ELSE @orderby END) + ' ' + @sortdirection
+
+	-- EXEC spLongPrint @Sql
+	EXEC sp_executesql @Sql
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[DepartmentId] int NOT NULL
+	)
+	INSERT INTO #PageIndex ([DepartmentId])
+	SELECT [DepartmentId]
+	FROM #DisplayOrderTmp
+	GROUP BY [DepartmentId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) [pi].[DepartmentId] AS [Id],
+	[COM].[departmentName],
+	[COM].[defaultDepartment]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[department] [COM] with (NOLOCK) ON [COM].[department_id] = [pi].[DepartmentId] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spSearchEmployees]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spSearchEmployees] 
+@departmentId  int = NULL,
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[EmployeeId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([EmployeeId]) 
+	SELECT U.[user_id] AS [priceId] FROM [dbo].[backendEndUser] [U] INNER JOIN [dbo].[role] [a] on [U].[role_id] = [a].[role_id] INNER JOIN [dbo].[department] [b] on [U].[department_id] = [b].[department_id]    
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[active] = '1' AND ([U].[department_id] = @departmentId or @departmentId is NULL )   AND ([a].[roleName] != 'superAdmin') AND (( [U].[firstName] like '%' + @Keyword + '%'OR [U].[lastName] like '%' + @Keyword + '%'OR [U].[emailId] like '%' + @Keyword + '%' OR [U].[phoneNumber] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'ASC' THEN [U].[firstName] END ASC,
+		CASE WHEN @orderby = 'firstName' AND @sortdirection = 'DESC' THEN [U].[firstName] END DESC,
+        CASE WHEN @orderby = 'lastName' AND @sortdirection = 'ASC' THEN [U].[lastName] END ASC,
+		CASE WHEN @orderby = 'lastName'AND @sortdirection = 'DESC' THEN [U].[lastName] END DESC,
+		CASE WHEN @orderby = 'emailId' AND @sortdirection = 'ASC' THEN [U].[emailId] END ASC,
+		CASE WHEN @orderby = 'emailId' AND @sortdirection = 'DESC' THEN [U].[emailId] END DESC,
+		CASE WHEN @orderby = 'phoneNumber' AND @sortdirection = 'ASC' THEN [U].[phoneNumber] END ASC,
+		CASE WHEN @orderby = 'phoneNumber' AND @sortdirection = 'DESC' THEN [U].[phoneNumber] END DESC,
+		CASE WHEN @orderby = 'role' AND @sortdirection = 'ASC' THEN [a].[roleName] END ASC,
+		CASE WHEN @orderby = 'role' AND @sortdirection = 'DESC' THEN [a].[roleName] END DESC,
+		CASE WHEN @orderby = 'deaprtment' AND @sortdirection = 'ASC' THEN [b].[departmentName] END ASC,
+		CASE WHEN @orderby = 'department' AND @sortdirection = 'DESC' THEN [b].[departmentName] END DESC
+
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[EmployeeId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([EmployeeId])
+	SELECT [EmployeeId]
+	FROM #DisplayOrderTmp
+	GROUP BY [EmployeeId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) [pi].[EmployeeId] AS [Id],
+	[COM].[firstName],
+	[COM].[lastName],
+	[COM].[EmailId],
+	[COM].[phoneNumber],
+	[COM].[role_id],
+	[COM1].[roleName],
+	[COM].[department_id],
+	[COM2].[departmentName],
+	[COM].[password],
+	[COM].[status],
+	[COM].[active],
+	CONVERT(VARCHAR, [COM].[create_ts], 106) AS [create_ts],
+	CONVERT(VARCHAR, [COM].[lastLogin], 106) AS [lastLogin]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[backendEndUser] [COM] with (NOLOCK) ON [COM].[user_id] = [pi].[EmployeeId] 
+		INNER JOIN [dbo].[role] [COM1] with (NOLOCK) ON [COM].[role_id] =[COM1].[role_id] 
+		INNER JOIN [dbo].[department] [COM2] with (NOLOCK) ON [COM].[department_id] =[COM2].[department_id]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spSearchReportType]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spSearchReportType]
+@reportName NVARCHAR(200) = NULL, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'reportName', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	int = 0,
+@pagesize int = 25,
+@TotalRecords int=NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] int IDENTITY (1, 1) NOT NULL,
+		[reportId] int NOT NULL
+	)
+	
+	SET @Sql = 'INSERT INTO #DisplayOrderTmp ([reportId]) SELECT U.[report_id] AS [reportId]
+	FROM [dbo].[opsreporttype] [U] WHERE 1=1';
+
+	if(@reportName IS NOT NULL AND @reportName != '')
+	SET @Sql = @Sql + ' AND ([U].reporttype=' + CONVERT(NVARCHAR,@reportName) + ') ';
+
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	
+	SET @Keyword = '%' + @Keyword + '%'
+
+	SET @sql = @sql + ' AND [U].[reporttype] like ' + '''' + @Keyword + '''' ;
+	END
+
+	IF(@orderby IS NOT NULL AND @orderby != '')
+	SET @Sql = @Sql + ' ORDER BY ' + (CASE WHEN @orderby='reportName' THEN '[U].[reporttype]' ELSE @orderby END) + ' ' + @sortdirection
+
+	-- EXEC spLongPrint @Sql
+	EXEC sp_executesql @Sql
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[reportId] int NOT NULL
+	)
+	INSERT INTO #PageIndex ([reportId])
+	SELECT [reportId]
+	FROM #DisplayOrderTmp
+	GROUP BY [reportId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) [pi].[reportId] AS [Id],
+	[COM].[reporttype]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].opsreporttype [COM] with (NOLOCK) ON [COM].[report_id] = [pi].[reportId]
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spSearchRow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spSearchRow]
+@roleName NVARCHAR(200) = NULL, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'role_id', 
+@sortdirection NVARCHAR(200) = 'ASC',
+@pagenumber	int = 0,
+@pagesize int = 25,
+@TotalRecords int=NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	DECLARE @Sql NVARCHAR(MAX) = '';
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] int IDENTITY (1, 1) NOT NULL,
+		[role_id] int NOT NULL
+	)
+	
+	SET @Sql = 'INSERT INTO #DisplayOrderTmp ([role_id]) SELECT U.[role_id] AS [role_id]
+	FROM [dbo].[role] [U] WHERE 1=1 AND [U].[roleName] != ''superAdmin''';
+
+	if(@roleName IS NOT NULL AND @roleName != '')
+	SET @Sql = @Sql + ' AND ([U].roleName=' + CONVERT(NVARCHAR,@roleName) + ') ';
+
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	
+	SET @Keyword = '%' + @Keyword + '%'
+
+	SET @sql = @sql + ' AND [U].[roleName] like ' + '''' + @Keyword + '''' ;
+	END
+
+	IF(@orderby IS NOT NULL AND @orderby != '')
+	SET @Sql = @Sql + ' ORDER BY ' + (CASE WHEN @orderby='roleName' THEN '[U].[roleName]' ELSE @orderby END) + ' ' + @sortdirection
+
+	-- EXEC spLongPrint @Sql
+	EXEC sp_executesql @Sql
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] int IDENTITY (1, 1) NOT NULL,
+		[role_id] int NOT NULL
+	)
+	INSERT INTO #PageIndex ([role_id])
+	SELECT [role_id]
+	FROM #DisplayOrderTmp
+	GROUP BY [role_id],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn) [pi].[role_id] AS [Id],
+	[COM].[roleName]
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[role] [COM] with (NOLOCK) ON [COM].[role_id] = [pi].[role_id] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spService]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spService] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[serviceId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([serviceId]) 
+	SELECT U.[service_id] AS [serviceId] FROM [dbo].[service] [U]
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[active] = '1' AND  (( [U].[serviceName] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'serviceName' AND @sortdirection = 'ASC' THEN [U].[serviceName] END ASC,
+		CASE WHEN @orderby = 'serviceName' AND @sortdirection = 'DESC' THEN [U].[serviceName] END DESC
+        
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[serviceId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([serviceId])
+	SELECT [serviceId]
+	FROM #DisplayOrderTmp
+	GROUP BY [serviceId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[service_id],
+	[COM].[serviceCode],
+	[COM].[serviceCategory],
+	[COM].[serviceName],
+	[COM].[numberOfTeam],
+	[COM].[description],
+	[COM].[policy],
+	[COM].[metaTitle],
+	[COM].[metaKeyword],
+	[COM].[metaDescription],
+    [COM].[vatPercentage],
+	[COM].[flag],
+	[COM].[preffered_date_count],
+	[COM].[Timeconstarint_in_hours],
+	[COM].[serviceCategory],
+	[COM].[contractSequence],
+	[COM].[contractCode],
+	[COM].[contractTitle],
+	[COM].[jobIdCode],
+	[COM].[Keywords],
+	[COM].[Url],
+	[COM].[active],
+	[COM].[image]
+
+	
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[service] [COM] with (NOLOCK) ON [COM].[service_id] = [pi].[serviceId] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spServiceWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spServiceWorkflow] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[serviceId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([serviceId]) 
+	SELECT U.[service_id] AS [serviceId] FROM [dbo].[serviceworkflow] [U]
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ( [U].[status] = @status or  @status is NULL ) AND ([U].[user_id] =@userId or @userId is NULL ) AND  (( [U].[serviceName] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'serviceName' AND @sortdirection = 'ASC' THEN [U].[serviceName] END ASC,
+		CASE WHEN @orderby = 'serviceName' AND @sortdirection = 'DESC' THEN [U].[serviceName] END DESC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[service_id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[service_id] END DESC
+        
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[serviceId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([serviceId])
+	SELECT [serviceId]
+	FROM #DisplayOrderTmp
+	GROUP BY [serviceId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[service_id],
+	[COM].[serviceCode],
+	[COM].[serviceCategory],
+	[COM].[serviceName],
+	[COM].[numberOfTeam],
+	[COM].[description],
+	[COM].[policy],
+	[COM].[metaTitle],
+	[COM].[metaKeyword],
+	[COM].[metaDescription],
+    [COM].[vatPercentage],
+	[COM].[flag],
+	[COM].[preffered_date_count],
+	[COM].[Timeconstarint_in_hours],
+	[COM].[serviceCategory],
+	[COM].[contractSequence],
+	[COM].[contractCode],
+	[COM].[contractTitle],
+	[COM].[jobIdCode],
+	[COM].[Keywords],
+	[COM].[Url],
+	[COM].[requestDate],
+	[COM].[author],
+	[COM].[image],
+	[COM].[status],
+	[COM].[action],
+	[COM].[publisher],
+	[COM].[comments],
+	[COM].[statusActionDate]
+
+	
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[serviceworkflow] [COM] with (NOLOCK) ON [COM].[service_id] = [pi].[serviceId] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spStaticConfigurationWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spStaticConfigurationWorkflow] 
+
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[sid] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([sid] )
+	SELECT [U].[id] AS [sid] FROM [dbo].[staticContentWorkflow] [U]
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ( [U].[status] = @status or  @status is NULL ) AND ([U].[user_id] =@userId or @userId is NULL ) AND (( [U].[pageName] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'pageName' AND @sortdirection = 'ASC' THEN [U].[pageName] END ASC,
+		CASE WHEN @orderby = 'pageName' AND @sortdirection = 'DESC' THEN [U].[pageName] END DESC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[id] END DESC
+        
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[sid] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([sid])
+	SELECT [sid]
+	FROM #DisplayOrderTmp
+	GROUP BY [sid],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[id],
+	[COM].[requestId],
+	[COM].[oldContent],
+	[COM].[requestedDate],
+	[COM].[author],
+	[COM].[pageName],
+	[COM].[componentName],
+	[COM].[functionalConfig],
+	[COM].[keys],
+	[COM].[value],
+	[COM].[status],
+	[COM].[publisher],
+	[COM].[comments],
+	[COM].[statusActionDate],
+	[COM].[isImage]
+
+	
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[staticContentWorkflow] [COM] with (NOLOCK) ON [COM].[id] = [pi].[sid] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[sptimeslot]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[sptimeslot] 
+@serviceId int = 1, 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[timeslotConfigId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([timeslotConfigId]) 
+	SELECT U.[timeslotConfigId] AS [timeslotConfigId] FROM [dbo].[timeslotConfig] [U] 
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ([U].[service_id] = @serviceId or @serviceId is NULL) AND [U].[active] = '1' AND  (@Keyword IS NULL OR @Keyword = '')
+		ORDER BY 
+		CASE WHEN @orderby = 'serviceId' AND @sortdirection = 'ASC' THEN [U].[service_id] END ASC,
+		CASE WHEN @orderby = 'serviceId' AND @sortdirection = 'DESC' THEN [U].[service_id] END DESC
+       
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[timeslotConfigId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([timeslotConfigId])
+	SELECT [timeslotConfigId]
+	FROM #DisplayOrderTmp
+	GROUP BY [timeslotConfigId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[timeslotConfigId],
+	[COM].[service_id],
+	[COM].[slotRange]
+	
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[timeslotConfig] [COM] with (NOLOCK) ON [COM].[timeslotConfigId] = [pi].[timeslotConfigId] 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spUpsell]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spUpsell] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = NULL, 
+@sortdirection NVARCHAR(200) = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[UpsellId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([UpsellId]) 
+	SELECT distinct [U].[bundle_id] AS [bundle_id] FROM [dbo].[upsellMapping] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE [U].[flag] = '1' AND (( [U].[bundle_id] like '%' + @Keyword + '%'  ) OR (@Keyword IS NULL OR @Keyword = ''))
+		
+
+        
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [UpsellId]
+	FROM #DisplayOrderTmp
+	GROUP BY [UpsellId],[Id]
+	ORDER BY min([Id])
+
+	--total records
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	
+	[pi].[CustId] AS bundle_id
+
+	FROM
+		#PageIndex [pi]
+		 
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+/****** Object:  StoredProcedure [dbo].[spUpsellWorkflow]    Script Date: 28-09-2021 19:21:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[spUpsellWorkflow] 
+ 
+@keyword NVARCHAR(MAX) = NULL, 
+@orderby NVARCHAR(200) = 'id', 
+@sortdirection NVARCHAR(200) = 'DESC',
+@status  NVARCHAR(200) = NULL,
+@userId int = NULL,
+@pagenumber	INT = 0,
+@pagesize INT =1000,
+@TotalRecords INT= NULL OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+	--paging
+	DECLARE @PageLowerBound int;
+	DECLARE @PageUpperBound int;
+	DECLARE @RowsToReturn int;
+	SET @RowsToReturn = @pagesize * (@pagenumber +  1)	
+	SET @PageLowerBound = @pagesize * @pagenumber
+	SET @PageUpperBound = @PageLowerBound + @pagesize + 1
+	SET @Keyword = ISNULL(@keyword, '')
+	SET @Keyword = RTRIM(LTRIM(@keyword))
+	IF ISNULL(@Keyword, '') != ''
+	BEGIN
+	SET @Keyword = REPLACE(@Keyword, '''', '')
+	SET @Keyword = REPLACE(@Keyword, '"', '')
+
+	--clean multiple spaces
+	WHILE CHARINDEX('  ', @Keyword) > 0 
+	SET @Keyword = REPLACE(@Keyword, '  ', ' ')
+	SET @Keyword = '%' + @Keyword + '%';
+	END
+	DECLARE @orderDirection INT;
+	SELECT @orderDirection = CASE @sortdirection WHEN 'ASC' THEN -1 ELSE 1 END;
+
+	CREATE TABLE #DisplayOrderTmp 
+	(
+		[Id] INT IDENTITY (1, 1) NOT NULL,
+		[UpsellId] INT NOT NULL
+	)
+	
+	INSERT INTO #DisplayOrderTmp ([UpsellId]) 
+	SELECT U.[request_id] AS [UpsellId] FROM [dbo].[upsellMappingWorkflow] [U]  
+	--WHERE [U].[created_ts] >= CONVERT(datetime,@Fromdate,103) AND [U].[created_ts]<= CONVERT(datetime,@Todate,103)
+	--WHERE (([U].[created_ts] >= CONVERT(datetime,@Fromdate,103) OR (@fromDate IS NULL OR @fromDate = '')) 
+	--AND ([U].[created_ts] <= CONVERT(datetime,@Fromdate,103) OR (@toDate IS NULL OR @toDate = '')))
+	WHERE ( [U].[status] = @status or  @status is NULL )AND ([U].[user_id] =@userId or @userId is NULL ) AND (( [U].[bundle_id] like '%' + @Keyword + '%'  OR [U].[service_id] like '%' + @Keyword + '%' ) OR (@Keyword IS NULL OR @Keyword = ''))
+		ORDER BY 
+		CASE WHEN @orderby = 'bundle_id' AND @sortdirection = 'ASC' THEN [U].[bundle_id] END ASC,
+		CASE WHEN @orderby = 'bundle_id' AND @sortdirection = 'DESC' THEN [U].[bundle_id] END DESC,
+        CASE WHEN @orderby = 'id' AND @sortdirection = 'ASC' THEN [U].[request_id] END ASC,
+		CASE WHEN @orderby = 'id' AND @sortdirection = 'DESC' THEN [U].[request_id] END DESC,
+		CASE WHEN @orderby = 'service_id' AND @sortdirection = 'ASC' THEN [U].[service_id] END ASC,
+		CASE WHEN @orderby = 'service_id' AND @sortdirection = 'DESC' THEN [U].[service_id] END DESC
+
+	CREATE TABLE #PageIndex 
+	(
+		[IndexId] INT IDENTITY (1, 1) NOT NULL,
+		[CustId] INT NOT  NULL
+	)
+
+	INSERT INTO #PageIndex ([CustId])
+	SELECT [UpsellId]
+	FROM #DisplayOrderTmp
+	GROUP BY [UpsellId],[Id]
+	ORDER BY min([Id])
+
+	--total recordse
+	SET @TotalRecords = @@rowcount
+    DROP TABLE #DisplayOrderTmp
+
+	SELECT TOP (@RowsToReturn)
+	[COM].[request_id],
+	[COM].[bundle_id],
+	[COM].[service_id],
+	[COM].[Author],
+	[COM].[requestedDate],
+	[COM].[status],
+	[COM].[action],
+	[COM].[publisher],
+    [COM]. [statusActionDate],
+    [COM].  [comments]
+
+	FROM
+		#PageIndex [pi]
+		INNER JOIN [dbo].[upsellMappingWorkflow] [COM] with (NOLOCK) ON [COM].[request_id] = [pi].[CustId]  
+		WHERE
+		[pi].IndexId > @PageLowerBound AND 
+		[pi].IndexId < @PageUpperBound
+	ORDER BY [pi].[IndexId]
+	SET NOCOUNT OFF; 
+	DROP TABLE #PageIndex
+END
+GO
+USE [master]
+GO
+ALTER DATABASE [concordiaods] SET  READ_WRITE 
+GO
